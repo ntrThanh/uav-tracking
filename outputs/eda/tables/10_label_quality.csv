@@ -1,0 +1,9 @@
+,train,val,test-dev
+zero or negative size,0,0,0
+outside image (any side),31,0,3
+tiny (min side < 4px),0,0,0
+extreme aspect (>10 or <0.1),100,26,9
+score = 0 on object class,0,0,0
+"duplicate (seq, frame, id)",0,0,0
+exact duplicate box,0,0,2
+frame index > sequence length,0,0,0

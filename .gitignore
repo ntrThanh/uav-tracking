@@ -1,0 +1,56 @@
+# Datasets (download separately, see README)
+data/
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# Training runs, checkpoints and weights
+runs/
+checkpoints/
+weights/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.engine
+*.bin
+*_openvino_model/
+
+# Large experiment outputs (keep EDA figures/tables and result tables)
+results/dets/
+results/tracks/
+results/trackeval/
+results/features/
+outputs/videos/
+*.mp4
+*.avi
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Environments
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Tools and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+nohup.out
+
+# Office lock files
+~$*

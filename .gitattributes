@@ -1,0 +1,7 @@
+* text=auto eol=lf
+
+*.ipynb linguist-documentation
+*.png binary
+*.jpg binary
+*.docx binary
+*.xlsx binary
