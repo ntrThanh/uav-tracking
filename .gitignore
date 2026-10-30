@@ -1,9 +1,13 @@
-# Datasets (download separately, see README)
-data/
+# Datasets: raw data and generated formats (see data/README.md); data/tools and data/splits are tracked
+/data/raw/
+/data/processed/
 *.zip
 *.tar
 *.tar.gz
 *.7z
+
+# Third-party model repos (cloned separately, see README)
+models/rf-detr/
 
 # Training runs, checkpoints and weights
 runs/

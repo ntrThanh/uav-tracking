@@ -17,20 +17,23 @@ Benchmarking 3 detectors (YOLO11, Faster R-CNN, RF-DETR) × 5 trackers (SORT, De
 ```
 .
 ├── docs/             # kế hoạch, phân công, mô tả nhiệm vụ
-├── src/
-│   └── notebooks/    # notebook phân tích (EDA, ...)
+├── data/             # mô tả dữ liệu, code tiền xử lý dùng chung, danh sách frame
+├── src/              # code train, inference, tracking, đánh giá, notebook
+├── models/rf-detr/   # mã nguồn RF-DETR gốc (clone riêng, không đưa lên git)
 ├── outputs/eda/      # biểu đồ và bảng thống kê dữ liệu
-├── data/             # dữ liệu, không đưa lên git
 └── requirements.txt
 ```
 
 ## Dữ liệu
 
-Tải VisDrone2019-MOT (train, val, test-dev) từ [VisDrone-Dataset](https://github.com/VisDrone/VisDrone-Dataset) và giải nén vào `data/raw/`:
+Tải VisDrone2019-MOT (train, val, test-dev) từ [VisDrone-Dataset](https://github.com/VisDrone/VisDrone-Dataset), giải nén vào `data/raw/`, rồi tạo các định dạng dùng chung:
 
+```bash
+python data/tools/prepare.py all
+python data/tools/check.py
 ```
-data/raw/VisDrone2019-MOT-{train,val,test-dev}/{sequences,annotations}
-```
+
+Chi tiết về bộ dữ liệu và quy tắc tiền xử lý xem tại [data/README.md](data/README.md).
 
 ## Cài đặt
 
