@@ -1,0 +1,31 @@
+# T3-hr: RF-DETR Medium at high resolution. Only the resolution changes compared to T3.
+# Run on both GPUs (DDP): bash src/scripts/train_rfdetr.sh src/configs/detectors/rfdetr_m_1024.yaml 0,1
+#
+# Effective batch = 4 x 2 x 2 GPUs = 16. Multi-scale training samples square sizes from 864 to 1184 px,
+# so VRAM is not measured yet: watch the first minutes, and if it runs out use batch_size=2 grad_accum_steps=4.
+
+run_name: T3hr_rfdetr_m_1024
+model: medium
+resolution: 1024
+dataset_dir: data/processed/rfdetr
+output_root: runs/det
+
+train:
+  epochs: 60
+  batch_size: 4                  # per GPU
+  grad_accum_steps: 2
+  lr: 1.0e-4
+  lr_encoder: 1.5e-4
+  weight_decay: 1.0e-4
+  lr_scheduler: cosine           # library default is "step" with lr_drop=100, i.e. constant lr for 60 epochs
+  lr_scheduler_kwargs:
+    min_factor: 0.01             # cosine from 1e-4 down to 1e-6
+  warmup_epochs: 1.0             # linear warmup (new 10-class head starts from random init)
+  early_stopping: true
+  early_stopping_patience: 15    # cosine needs time; avoid stopping during the early plateau
+  num_workers: 12                # per GPU
+  checkpoint_interval: 5
+  seed: 0
+  tensorboard: true
+  progress_bar: tqdm
+  log_per_class_metrics: true

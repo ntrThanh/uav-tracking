@@ -9,8 +9,9 @@
 # Third-party model repos (cloned separately, see README)
 models/rf-detr/
 
-# Training runs, checkpoints and weights
+# Training runs, checkpoints, weights and job logs
 runs/
+logs/
 checkpoints/
 weights/
 *.pt

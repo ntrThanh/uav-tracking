@@ -1,4 +1,4 @@
-"""Shared constants and parsers for VisDrone2019-MOT.
+"""Shared constants and parsers for VisDrone2019-MOT and the VisDrone2019-DET train set.
 
 Every converter in this folder imports from here so that all team members use
 the same class ids, splits and box cleaning rules.
@@ -23,6 +23,9 @@ TRACK_CLASSES = [1, 4, 5, 6, 9]          # classes evaluated by VisDrone-MOT
 
 TRAIN_STRIDE = 2                         # keep every 2nd train frame (odd frames)
 FRAME_RATE = 30                          # VisDrone does not ship FPS; 30 is the common assumption
+
+DET_TRAIN = "VisDrone2019-DET-train"     # extra training images (Task 1), see det_overlap.py
+DET_EXCLUDED = "det_train_excluded.txt"  # in data/splits/: DET images removed to avoid leakage
 
 
 def log(msg: str, level: int = 0) -> None:
@@ -102,3 +105,55 @@ def selected_frames(seq: Sequence) -> list[int]:
     if seq.split == "train":
         return [f for f in frames if (f - 1) % TRAIN_STRIDE == 0]
     return list(frames)
+
+
+@dataclass
+class Item:
+    """One detector image (a MOT frame or a DET image) with its cleaned labels."""
+    name: str                   # flat unique file name used by the RF-DETR and YOLO layouts
+    path: Path
+    width: int
+    height: int
+    objects: list[Box]
+    ignored: list[Box]
+    source: str                 # "mot" or "det"
+    seq: str | None = None
+    frame: int | None = None
+
+
+def mot_items(seq: Sequence) -> list[Item]:
+    by_frame: dict[int, list[Box]] = {}
+    ign_frame: dict[int, list[Box]] = {}
+    for b in seq.objects:
+        by_frame.setdefault(b.frame, []).append(b)
+    for b in seq.ignored:
+        ign_frame.setdefault(b.frame, []).append(b)
+    return [Item(f"{seq.name}_{f:07d}.jpg", seq.image_path(f), seq.width, seq.height, by_frame.get(f, []),
+                 ign_frame.get(f, []), "mot", seq.name, f) for f in selected_frames(seq)]
+
+
+def video_id(name: str) -> str:
+    """Video id shared by MOT sequences (uav0000086_00000_v) and DET images (0000086_00118_d_0000001)."""
+    return name.split("_")[0].replace("uav", "")
+
+
+def load_det_image(raw_root: Path, name: str) -> Item:
+    """DET labels: x,y,w,h,score,class,truncation,occlusion (no frame or track id)."""
+    path = raw_root / DET_TRAIN / "images" / f"{name}.jpg"
+    with Image.open(path) as im:
+        width, height = im.size
+    objects, ignored = [], []
+    for line in open(raw_root / DET_TRAIN / "annotations" / f"{name}.txt"):
+        x, y, w, h, s, c, t, o = [int(v) for v in line.strip().rstrip(",").split(",")[:8]]
+        box = clip_box(Box(0, -1, x, y, w, h, s, c, t, o), width, height)
+        if box is None:
+            continue
+        if box.cls == IGNORED_CLASS:
+            ignored.append(box)
+        elif box.cls in CLASS_NAMES:
+            objects.append(box)
+    return Item(f"det_{name}.jpg", path, width, height, objects, ignored, "det")
+
+
+def list_det_images(raw_root: Path) -> list[str]:
+    return sorted(p.stem for p in (raw_root / DET_TRAIN / "annotations").glob("*.txt"))

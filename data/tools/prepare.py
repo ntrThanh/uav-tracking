@@ -1,11 +1,16 @@
-"""Convert VisDrone2019-MOT into the shared formats used by the team.
+"""Convert VisDrone into the shared formats used by the team.
+
+Two training variants share the same val and test-dev (MOT):
+    mot     train = VisDrone2019-MOT train, stride 2                 -> processed/{coco,rfdetr,yolo}/
+    motdet  train = mot + VisDrone2019-DET train minus leaked images -> processed/{coco,rfdetr,yolo}_motdet/
 
 Usage (from the project root):
-    python data/tools/prepare.py all          # splits + coco + rfdetr + yolo + mot
-    python data/tools/prepare.py coco rfdetr  # only some targets
+    python data/tools/prepare.py all                       # every target, both variants (motdet if DET exists)
+    python data/tools/prepare.py rfdetr --variants motdet  # only some targets / variants
 
-Inputs:  data/raw/VisDrone2019-MOT-{train,val,test-dev}/{sequences,annotations}
-Outputs: data/splits/ and data/processed/{coco,rfdetr,yolo,mot}/ (see data/README.md)
+Inputs:  data/raw/VisDrone2019-MOT-{train,val,test-dev}/, data/raw/VisDrone2019-DET-train/ (optional)
+         data/splits/det_train_excluded.txt (from det_overlap.py, required for motdet)
+Outputs: data/splits/ and data/processed/ (see data/README.md)
 """
 from __future__ import annotations
 
@@ -14,10 +19,11 @@ import json
 import os
 import shutil
 import time
+from collections import Counter
 from pathlib import Path
 
-from visdrone import (CLASS_NAMES, FRAME_RATE, SPLITS, TRAIN_STRIDE, Sequence, list_sequences, load_sequence, log,
-                      selected_frames)
+from visdrone import (CLASS_NAMES, DET_EXCLUDED, DET_TRAIN, FRAME_RATE, SPLITS, TRAIN_STRIDE, Item, Sequence,
+                      list_det_images, list_sequences, load_det_image, load_sequence, log, mot_items)
 
 DATA_DIR = Path(__file__).resolve().parents[1]
 RAW = DATA_DIR / "raw"
@@ -25,11 +31,11 @@ SPLIT_DIR = DATA_DIR / "splits"
 OUT = DATA_DIR / "processed"
 RFDETR_SPLIT = {"train": "train", "val": "valid", "test-dev": "test"}
 TARGETS = ["splits", "coco", "rfdetr", "yolo", "mot"]
+VARIANTS = ["mot", "motdet"]
 
 
-def image_name(seq: Sequence, frame: int) -> str:
-    """Flat, unique file name used by the RF-DETR and YOLO layouts."""
-    return f"{seq.name}_{frame:07d}.jpg"
+def suffix(variant: str) -> str:
+    return "" if variant == "mot" else f"_{variant}"
 
 
 def relink(link: Path, target: Path) -> None:
@@ -46,117 +52,125 @@ def reset_dir(path: Path) -> Path:
     return path
 
 
-def load_split(split: str) -> list[Sequence]:
-    seqs = [load_sequence(RAW, split, name) for name in list_sequences(RAW, split)]
-    n_obj = sum(len(s.objects) for s in seqs)
-    log(f"Loaded {split}: {len(seqs)} sequences, {sum(s.n_frames for s in seqs):,} frames, {n_obj:,} boxes", 1)
+# ---------------------------------------------------------------- loading
+def load_mot(splits: list[str]) -> dict[str, list[Sequence]]:
+    seqs = {}
+    for split in splits:
+        seqs[split] = [load_sequence(RAW, split, name) for name in list_sequences(RAW, split)]
+        n_obj = sum(len(s.objects) for s in seqs[split])
+        log(f"MOT {split}: {len(seqs[split])} sequences, {sum(s.n_frames for s in seqs[split]):,} frames, "
+            f"{n_obj:,} boxes", 1)
     return seqs
 
 
+def load_det() -> list[Item]:
+    excluded_file = SPLIT_DIR / DET_EXCLUDED
+    if not excluded_file.exists():
+        raise SystemExit(f"Missing {excluded_file}. Run: python data/tools/det_overlap.py")
+    excluded = {line.split("\t")[0] for line in excluded_file.read_text().splitlines() if line}
+    names = [n for n in list_det_images(RAW) if n not in excluded]
+    items = [load_det_image(RAW, n) for n in names]
+    log(f"DET train: {len(items):,} images kept ({len(excluded)} excluded), "
+        f"{sum(len(i.objects) for i in items):,} boxes", 1)
+    return items
+
+
+def build_items(mot: dict[str, list[Sequence]], det: list[Item] | None, variant: str) -> dict[str, list[Item]]:
+    items = {split: [it for s in seqs for it in mot_items(s)] for split, seqs in mot.items()}
+    if variant == "motdet" and "train" in items:
+        items["train"] = items["train"] + det
+    return items
+
+
 # ---------------------------------------------------------------- splits
-def make_splits(data: dict[str, list[Sequence]]) -> None:
-    log("Writing frame lists")
+def make_splits(items: dict[str, list[Item]], variant: str) -> None:
+    log(f"[{variant}] Writing frame lists")
     SPLIT_DIR.mkdir(parents=True, exist_ok=True)
-    for split, seqs in data.items():
-        lines = [f"{s.name}/{f:07d}" for s in seqs for f in selected_frames(s)]
-        (SPLIT_DIR / f"{split}.txt").write_text("\n".join(lines) + "\n")
-        note = f" (stride {TRAIN_STRIDE})" if split == "train" else " (all frames)"
-        log(f"splits/{split}.txt: {len(lines):,} frames{note}", 1)
+    for split, its in items.items():
+        if variant != "mot" and split != "train":
+            continue                       # val and test-dev are identical across variants
+        lines = [f"{it.seq}/{it.frame:07d}" if it.source == "mot" else f"det/{it.path.stem}" for it in its]
+        name = f"{split}{suffix(variant)}.txt"
+        (SPLIT_DIR / name).write_text("\n".join(lines) + "\n")
+        src = Counter(it.source for it in its)
+        log(f"splits/{name}: {len(lines):,} images ({', '.join(f'{k} {v:,}' for k, v in sorted(src.items()))})", 1)
 
 
 # ---------------------------------------------------------------- coco
-def build_coco(seqs: list[Sequence], file_name) -> dict:
-    """COCO dict for the selected frames. `file_name(seq, frame)` decides the image path."""
+def build_coco(items: list[Item], file_name) -> dict:
+    """COCO dict. `file_name(item)` decides the image path stored in the json."""
     images, annotations, ignored = [], [], []
-    by_frame: dict[tuple[str, int], list] = {}
-    for s in seqs:
-        for b in s.objects:
-            by_frame.setdefault((s.name, b.frame), []).append(b)
-    ign_frame: dict[tuple[str, int], list] = {}
-    for s in seqs:
-        for b in s.ignored:
-            ign_frame.setdefault((s.name, b.frame), []).append(b)
-
-    for s in seqs:
-        for f in selected_frames(s):
-            image_id = len(images) + 1
-            images.append({"id": image_id, "file_name": file_name(s, f), "width": s.width, "height": s.height,
-                           "seq": s.name, "frame": f})
-            for b in by_frame.get((s.name, f), []):
-                annotations.append({
-                    "id": len(annotations) + 1, "image_id": image_id, "category_id": b.cls,
-                    "bbox": [b.x, b.y, b.w, b.h], "area": b.w * b.h, "iscrowd": 0,
-                    "track_id": b.track_id, "occlusion": b.occ, "truncation": b.trunc,
-                })
-            for b in ign_frame.get((s.name, f), []):
-                ignored.append({"image_id": image_id, "bbox": [b.x, b.y, b.w, b.h]})
-
+    for it in items:
+        image_id = len(images) + 1
+        images.append({"id": image_id, "file_name": file_name(it), "width": it.width, "height": it.height,
+                       "source": it.source, "seq": it.seq, "frame": it.frame})
+        for b in it.objects:
+            annotations.append({
+                "id": len(annotations) + 1, "image_id": image_id, "category_id": b.cls,
+                "bbox": [b.x, b.y, b.w, b.h], "area": b.w * b.h, "iscrowd": 0,
+                "track_id": b.track_id, "occlusion": b.occ, "truncation": b.trunc,
+            })
+        for b in it.ignored:
+            ignored.append({"image_id": image_id, "bbox": [b.x, b.y, b.w, b.h]})
     categories = [{"id": k, "name": v, "supercategory": "visdrone"} for k, v in CLASS_NAMES.items()]
-    return {"info": {"description": "VisDrone2019-MOT (team shared format)"}, "images": images,
+    return {"info": {"description": "VisDrone2019 (team shared format)"}, "images": images,
             "annotations": annotations, "categories": categories, "ignored_regions": ignored}
 
 
-def make_coco(data: dict[str, list[Sequence]]) -> None:
-    log("Writing COCO json (file_name relative to data/raw)")
-    out = OUT / "coco"
+def make_coco(items: dict[str, list[Item]], variant: str) -> None:
+    log(f"[{variant}] Writing COCO json (file_name relative to data/raw)")
+    out = OUT / f"coco{suffix(variant)}"
     out.mkdir(parents=True, exist_ok=True)
-    for split, seqs in data.items():
-        coco = build_coco(seqs, lambda s, f: str(s.image_path(f).relative_to(RAW)))
+    for split, its in items.items():
+        coco = build_coco(its, lambda it: str(it.path.relative_to(RAW)))
         path = out / f"{split}.json"
         json.dump(coco, open(path, "w"))
-        log(f"coco/{split}.json: {len(coco['images']):,} images, {len(coco['annotations']):,} boxes, "
+        log(f"{path.relative_to(OUT)}: {len(coco['images']):,} images, {len(coco['annotations']):,} boxes, "
             f"{len(coco['ignored_regions']):,} ignored regions ({path.stat().st_size / 1e6:.0f} MB)", 1)
 
 
 # ---------------------------------------------------------------- rf-detr
-def make_rfdetr(data: dict[str, list[Sequence]]) -> None:
-    log("Writing RF-DETR layout (train/valid/test, images are symlinks)")
-    root = OUT / "rfdetr"
-    for split, seqs in data.items():
+def make_rfdetr(items: dict[str, list[Item]], variant: str) -> None:
+    log(f"[{variant}] Writing RF-DETR layout (train/valid/test, images are symlinks)")
+    root = OUT / f"rfdetr{suffix(variant)}"
+    for split, its in items.items():
         d = reset_dir(root / RFDETR_SPLIT[split])
-        coco = build_coco(seqs, image_name)
-        for s in seqs:
-            for f in selected_frames(s):
-                relink(d / image_name(s, f), s.image_path(f))
+        for it in its:
+            relink(d / it.name, it.path)
+        coco = build_coco(its, lambda it: it.name)
         json.dump(coco, open(d / "_annotations.coco.json", "w"))
-        log(f"rfdetr/{RFDETR_SPLIT[split]}/: {len(coco['images']):,} images, {len(coco['annotations']):,} boxes", 1)
+        log(f"{root.name}/{RFDETR_SPLIT[split]}/: {len(coco['images']):,} images, "
+            f"{len(coco['annotations']):,} boxes", 1)
 
 
 # ---------------------------------------------------------------- yolo
-def make_yolo(data: dict[str, list[Sequence]]) -> None:
-    log("Writing YOLO layout (class index = VisDrone id - 1, images are symlinks)")
-    root = OUT / "yolo"
-    for split, seqs in data.items():
+def make_yolo(items: dict[str, list[Item]], variant: str) -> None:
+    log(f"[{variant}] Writing YOLO layout (class index = VisDrone id - 1, images are symlinks)")
+    root = OUT / f"yolo{suffix(variant)}"
+    for split, its in items.items():
         img_dir = reset_dir(root / split / "images")
         lbl_dir = reset_dir(root / split / "labels")
-        n_img = n_box = 0
-        for s in seqs:
-            frames = set(selected_frames(s))
-            lines: dict[int, list[str]] = {f: [] for f in frames}
-            for b in s.objects:
-                if b.frame in frames:
-                    cx, cy = (b.x + b.w / 2) / s.width, (b.y + b.h / 2) / s.height
-                    lines[b.frame].append(f"{b.cls - 1} {cx:.6f} {cy:.6f} {b.w / s.width:.6f} {b.h / s.height:.6f}")
-            for f in sorted(frames):
-                name = image_name(s, f)
-                relink(img_dir / name, s.image_path(f))
-                (lbl_dir / name.replace(".jpg", ".txt")).write_text("\n".join(lines[f]) + ("\n" if lines[f] else ""))
-                n_img += 1
-                n_box += len(lines[f])
-        log(f"yolo/{split}/: {n_img:,} images, {n_box:,} boxes", 1)
+        n_box = 0
+        for it in its:
+            lines = [f"{b.cls - 1} {(b.x + b.w / 2) / it.width:.6f} {(b.y + b.h / 2) / it.height:.6f} "
+                     f"{b.w / it.width:.6f} {b.h / it.height:.6f}" for b in it.objects]
+            relink(img_dir / it.name, it.path)
+            (lbl_dir / it.name.replace(".jpg", ".txt")).write_text("\n".join(lines) + ("\n" if lines else ""))
+            n_box += len(lines)
+        log(f"{root.name}/{split}/: {len(its):,} images, {n_box:,} boxes", 1)
 
     names = "\n".join(f"  {k - 1}: {v}" for k, v in CLASS_NAMES.items())
     (root / "visdrone.yaml").write_text(
-        f"# Generated by data/tools/prepare.py\npath: {root}\ntrain: train/images\nval: val/images\n"
-        f"test: test-dev/images\nnames:\n{names}\n")
-    log("yolo/visdrone.yaml", 1)
+        f"# Generated by data/tools/prepare.py (variant {variant})\npath: {root}\ntrain: train/images\n"
+        f"val: val/images\ntest: test-dev/images\nnames:\n{names}\n")
+    log(f"{root.name}/visdrone.yaml", 1)
 
 
-# ---------------------------------------------------------------- mot
-def make_mot(data: dict[str, list[Sequence]]) -> None:
+# ---------------------------------------------------------------- mot (tracking ground truth, MOT only)
+def make_mot(mot: dict[str, list[Sequence]]) -> None:
     log("Writing MOTChallenge layout (all frames, for tracking evaluation)")
     root = OUT / "mot"
-    for split, seqs in data.items():
+    for split, seqs in mot.items():
         reset_dir(root / split)
         for s in seqs:
             d = root / split / s.name
@@ -178,15 +192,25 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("targets", nargs="+", choices=TARGETS + ["all"])
     ap.add_argument("--splits", nargs="+", default=SPLITS, choices=SPLITS)
+    ap.add_argument("--variants", nargs="+", choices=VARIANTS,
+                    help=f"default: mot, plus motdet when data/raw/{DET_TRAIN} exists")
     args = ap.parse_args()
     targets = TARGETS if "all" in args.targets else args.targets
+    variants = args.variants or (VARIANTS if (RAW / DET_TRAIN).exists() else ["mot"])
 
     t0 = time.time()
     log(f"Raw data: {RAW}")
-    data = {split: load_split(split) for split in args.splits}
-    steps = {"splits": make_splits, "coco": make_coco, "rfdetr": make_rfdetr, "yolo": make_yolo, "mot": make_mot}
-    for t in targets:
-        steps[t](data)
+    log(f"Variants: {', '.join(variants)} (train stride {TRAIN_STRIDE} on MOT)")
+    mot = load_mot(args.splits)
+    det = load_det() if "motdet" in variants and "train" in args.splits else None
+    steps = {"splits": make_splits, "coco": make_coco, "rfdetr": make_rfdetr, "yolo": make_yolo}
+    for variant in variants:
+        items = build_items(mot, det, variant)
+        for t in targets:
+            if t in steps:
+                steps[t](items, variant)
+    if "mot" in targets:
+        make_mot(mot)
     log(f"Done in {time.time() - t0:.0f}s")
 
 

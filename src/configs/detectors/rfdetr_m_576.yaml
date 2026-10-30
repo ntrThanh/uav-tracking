@@ -1,0 +1,33 @@
+# T3: RF-DETR Medium at the default resolution (main model of the 3 x 5 matrix).
+# Run on both GPUs (DDP): bash src/scripts/train_rfdetr.sh src/configs/detectors/rfdetr_m_576.yaml 0,1
+#
+# Effective batch = batch_size x grad_accum_steps x GPUs = 8 x 1 x 2 = 16 (same as the plan).
+# Measured on 2x L4: 44.5 img/s (about 4.5 min per epoch), 7.8 GB VRAM per GPU.
+# A single GPU reaches only 24.7 img/s at any batch size (GPU util 36-44%), so use both GPUs.
+# On a single GPU, set batch_size=4 grad_accum_steps=4 to keep the effective batch at 16.
+
+run_name: T3_rfdetr_m_576
+model: medium                    # nano | small | medium | base | large
+resolution: 576                  # must be a multiple of 32 for Medium
+dataset_dir: data/processed/rfdetr
+output_root: runs/det
+
+train:
+  epochs: 60
+  batch_size: 8                  # per GPU
+  grad_accum_steps: 1
+  lr: 1.0e-4
+  lr_encoder: 1.5e-4
+  weight_decay: 1.0e-4
+  lr_scheduler: cosine           # library default is "step" with lr_drop=100, i.e. constant lr for 60 epochs
+  lr_scheduler_kwargs:
+    min_factor: 0.01             # cosine from 1e-4 down to 1e-6
+  warmup_epochs: 1.0             # linear warmup (new 10-class head starts from random init)
+  early_stopping: true
+  early_stopping_patience: 15    # cosine needs time; avoid stopping during the early plateau
+  num_workers: 12                # per GPU
+  checkpoint_interval: 5
+  seed: 0
+  tensorboard: true
+  progress_bar: tqdm
+  log_per_class_metrics: true
