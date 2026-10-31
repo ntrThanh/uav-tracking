@@ -22,6 +22,7 @@ OTHERS_CLASS = 11
 TRACK_CLASSES = [1, 4, 5, 6, 9]          # classes evaluated by VisDrone-MOT
 
 TRAIN_STRIDE = 2                         # keep every 2nd train frame (odd frames)
+MOTDET_TRAIN_STRIDE = 6                  # motdet variant: fewer redundant MOT frames, all DET images (~1.5 h training)
 FRAME_RATE = 30                          # VisDrone does not ship FPS; 30 is the common assumption
 
 DET_TRAIN = "VisDrone2019-DET-train"     # extra training images (Task 1), see det_overlap.py
@@ -99,11 +100,11 @@ def list_sequences(raw_root: Path, split: str) -> list[str]:
     return sorted(p.stem for p in (split_dir(raw_root, split) / "annotations").glob("*.txt"))
 
 
-def selected_frames(seq: Sequence) -> list[int]:
-    """Frames used for detector training/evaluation: stride 2 on train, all frames elsewhere."""
+def selected_frames(seq: Sequence, stride: int = TRAIN_STRIDE) -> list[int]:
+    """Frames used for detector training/evaluation: every `stride`-th frame on train, all frames elsewhere."""
     frames = range(1, seq.n_frames + 1)
     if seq.split == "train":
-        return [f for f in frames if (f - 1) % TRAIN_STRIDE == 0]
+        return [f for f in frames if (f - 1) % stride == 0]
     return list(frames)
 
 
@@ -121,7 +122,7 @@ class Item:
     frame: int | None = None
 
 
-def mot_items(seq: Sequence) -> list[Item]:
+def mot_items(seq: Sequence, stride: int = TRAIN_STRIDE) -> list[Item]:
     by_frame: dict[int, list[Box]] = {}
     ign_frame: dict[int, list[Box]] = {}
     for b in seq.objects:
@@ -129,7 +130,7 @@ def mot_items(seq: Sequence) -> list[Item]:
     for b in seq.ignored:
         ign_frame.setdefault(b.frame, []).append(b)
     return [Item(f"{seq.name}_{f:07d}.jpg", seq.image_path(f), seq.width, seq.height, by_frame.get(f, []),
-                 ign_frame.get(f, []), "mot", seq.name, f) for f in selected_frames(seq)]
+                 ign_frame.get(f, []), "mot", seq.name, f) for f in selected_frames(seq, stride)]
 
 
 def video_id(name: str) -> str:
@@ -137,13 +138,17 @@ def video_id(name: str) -> str:
     return name.split("_")[0].replace("uav", "")
 
 
-def load_det_image(raw_root: Path, name: str) -> Item:
+def det_dir(raw_root: Path, split: str = "train") -> Path:
+    return raw_root / f"VisDrone2019-DET-{split}"
+
+
+def load_det_image(raw_root: Path, name: str, split: str = "train") -> Item:
     """DET labels: x,y,w,h,score,class,truncation,occlusion (no frame or track id)."""
-    path = raw_root / DET_TRAIN / "images" / f"{name}.jpg"
+    path = det_dir(raw_root, split) / "images" / f"{name}.jpg"
     with Image.open(path) as im:
         width, height = im.size
     objects, ignored = [], []
-    for line in open(raw_root / DET_TRAIN / "annotations" / f"{name}.txt"):
+    for line in open(det_dir(raw_root, split) / "annotations" / f"{name}.txt"):
         x, y, w, h, s, c, t, o = [int(v) for v in line.strip().rstrip(",").split(",")[:8]]
         box = clip_box(Box(0, -1, x, y, w, h, s, c, t, o), width, height)
         if box is None:
@@ -155,5 +160,5 @@ def load_det_image(raw_root: Path, name: str) -> Item:
     return Item(f"det_{name}.jpg", path, width, height, objects, ignored, "det")
 
 
-def list_det_images(raw_root: Path) -> list[str]:
-    return sorted(p.stem for p in (raw_root / DET_TRAIN / "annotations").glob("*.txt"))
+def list_det_images(raw_root: Path, split: str = "train") -> list[str]:
+    return sorted(p.stem for p in (det_dir(raw_root, split) / "annotations").glob("*.txt"))

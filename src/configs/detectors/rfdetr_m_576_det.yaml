@@ -1,0 +1,33 @@
+# T3-DET: RF-DETR Medium 576 trained on VisDrone2019-DET only (variant det):
+#   train = DET train (6,414 images, 57 leaked into MOT val/test-dev removed), val = DET val (548), test = DET test-dev.
+# Checkpoints are selected on DET val; tracking is still evaluated on VisDrone2019-MOT val/test-dev.
+# Run on both GPUs (DDP): bash src/scripts/train_rfdetr.sh src/configs/detectors/rfdetr_m_576_det.yaml 0,1
+#
+# Effective batch = batch_size x grad_accum_steps x GPUs = 8 x 1 x 2 = 16 (same as the plan).
+# 2x L4 at 44.5 img/s: about 2.6 min per epoch incl. validation, 40 epochs = about 1.7 h.
+
+run_name: T3det_rfdetr_m_576_det
+model: medium                    # nano | small | medium | base | large
+resolution: 576                  # must be a multiple of 32 for Medium
+dataset_dir: data/processed/rfdetr_det
+output_root: runs/det
+
+train:
+  epochs: 40
+  batch_size: 8                  # per GPU
+  grad_accum_steps: 1
+  lr: 1.0e-4
+  lr_encoder: 1.5e-4
+  weight_decay: 1.0e-4
+  lr_scheduler: cosine
+  lr_scheduler_kwargs:
+    min_factor: 0.01             # cosine from 1e-4 down to 1e-6
+  warmup_epochs: 1.0             # linear warmup (new 10-class head starts from random init)
+  early_stopping: true
+  early_stopping_patience: 8
+  num_workers: 12                # per GPU
+  checkpoint_interval: 5
+  seed: 0
+  tensorboard: true
+  progress_bar: tqdm
+  log_per_class_metrics: true

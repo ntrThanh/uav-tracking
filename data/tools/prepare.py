@@ -1,15 +1,18 @@
 """Convert VisDrone into the shared formats used by the team.
 
-Two training variants share the same val and test-dev (MOT):
-    mot     train = VisDrone2019-MOT train, stride 2                 -> processed/{coco,rfdetr,yolo}/
-    motdet  train = mot + VisDrone2019-DET train minus leaked images -> processed/{coco,rfdetr,yolo}_motdet/
+Three detector-training variants:
+    mot     train/val/test-dev = VisDrone2019-MOT (train stride 2)                 -> processed/{coco,rfdetr,yolo}/
+    motdet  train = MOT stride 6 + DET train (filtered), val/test-dev = MOT        -> processed/{coco,rfdetr,yolo}_motdet/
+    det     train = DET train (filtered), val = DET val, test-dev = DET test-dev    -> processed/{coco,rfdetr,yolo}_det/
+"Filtered" removes the DET train images listed in data/splits/det_train_excluded.txt (det_overlap.py).
+Tracking ground truth (target mot) always comes from VisDrone2019-MOT.
 
 Usage (from the project root):
-    python data/tools/prepare.py all                       # every target, both variants (motdet if DET exists)
-    python data/tools/prepare.py rfdetr --variants motdet  # only some targets / variants
+    python data/tools/prepare.py all                    # every target, every variant whose raw data exists
+    python data/tools/prepare.py rfdetr --variants det  # only some targets / variants
 
-Inputs:  data/raw/VisDrone2019-MOT-{train,val,test-dev}/, data/raw/VisDrone2019-DET-train/ (optional)
-         data/splits/det_train_excluded.txt (from det_overlap.py, required for motdet)
+Inputs:  data/raw/VisDrone2019-MOT-{train,val,test-dev}/, data/raw/VisDrone2019-DET-{train,val,test-dev}/ (optional)
+         data/splits/det_train_excluded.txt (from det_overlap.py, required for motdet and det)
 Outputs: data/splits/ and data/processed/ (see data/README.md)
 """
 from __future__ import annotations
@@ -22,8 +25,8 @@ import time
 from collections import Counter
 from pathlib import Path
 
-from visdrone import (CLASS_NAMES, DET_EXCLUDED, DET_TRAIN, FRAME_RATE, SPLITS, TRAIN_STRIDE, Item, Sequence,
-                      list_det_images, list_sequences, load_det_image, load_sequence, log, mot_items)
+from visdrone import (CLASS_NAMES, DET_EXCLUDED, FRAME_RATE, MOTDET_TRAIN_STRIDE, SPLITS, TRAIN_STRIDE, Item, Sequence,
+                      det_dir, list_det_images, list_sequences, load_det_image, load_sequence, log, mot_items)
 
 DATA_DIR = Path(__file__).resolve().parents[1]
 RAW = DATA_DIR / "raw"
@@ -31,7 +34,14 @@ SPLIT_DIR = DATA_DIR / "splits"
 OUT = DATA_DIR / "processed"
 RFDETR_SPLIT = {"train": "train", "val": "valid", "test-dev": "test"}
 TARGETS = ["splits", "coco", "rfdetr", "yolo", "mot"]
-VARIANTS = ["mot", "motdet"]
+VARIANTS = ["mot", "motdet", "det"]
+MOT_TRAIN_STRIDE = {"mot": TRAIN_STRIDE, "motdet": MOTDET_TRAIN_STRIDE, "det": TRAIN_STRIDE}
+
+
+def available_variants() -> list[str]:
+    """mot always; motdet needs DET train; det needs DET train, val and test-dev."""
+    have = [s for s in SPLITS if det_dir(RAW, s).exists()]
+    return ["mot"] + (["motdet"] if "train" in have else []) + (["det"] if len(have) == len(SPLITS) else [])
 
 
 def suffix(variant: str) -> str:
@@ -63,22 +73,31 @@ def load_mot(splits: list[str]) -> dict[str, list[Sequence]]:
     return seqs
 
 
-def load_det() -> list[Item]:
+def load_det(splits: list[str]) -> dict[str, list[Item]]:
+    """DET images per split; train drops the images listed in det_train_excluded.txt."""
     excluded_file = SPLIT_DIR / DET_EXCLUDED
     if not excluded_file.exists():
         raise SystemExit(f"Missing {excluded_file}. Run: python data/tools/det_overlap.py")
     excluded = {line.split("\t")[0] for line in excluded_file.read_text().splitlines() if line}
-    names = [n for n in list_det_images(RAW) if n not in excluded]
-    items = [load_det_image(RAW, n) for n in names]
-    log(f"DET train: {len(items):,} images kept ({len(excluded)} excluded), "
-        f"{sum(len(i.objects) for i in items):,} boxes", 1)
-    return items
+    det = {}
+    for split in splits:
+        if not det_dir(RAW, split).exists():
+            continue
+        names = [n for n in list_det_images(RAW, split) if split != "train" or n not in excluded]
+        det[split] = [load_det_image(RAW, n, split) for n in names]
+        note = f" ({len(excluded)} excluded)" if split == "train" else ""
+        log(f"DET {split}: {len(det[split]):,} images{note}, {sum(len(i.objects) for i in det[split]):,} boxes", 1)
+    return det
 
 
-def build_items(mot: dict[str, list[Sequence]], det: list[Item] | None, variant: str) -> dict[str, list[Item]]:
-    items = {split: [it for s in seqs for it in mot_items(s)] for split, seqs in mot.items()}
+def build_items(mot: dict[str, list[Sequence]], det: dict[str, list[Item]] | None,
+                variant: str) -> dict[str, list[Item]]:
+    if variant == "det":
+        return {split: det[split] for split in mot if split in det}
+    stride = MOT_TRAIN_STRIDE[variant]
+    items = {split: [it for s in seqs for it in mot_items(s, stride)] for split, seqs in mot.items()}
     if variant == "motdet" and "train" in items:
-        items["train"] = items["train"] + det
+        items["train"] = items["train"] + det["train"]
     return items
 
 
@@ -87,8 +106,8 @@ def make_splits(items: dict[str, list[Item]], variant: str) -> None:
     log(f"[{variant}] Writing frame lists")
     SPLIT_DIR.mkdir(parents=True, exist_ok=True)
     for split, its in items.items():
-        if variant != "mot" and split != "train":
-            continue                       # val and test-dev are identical across variants
+        if variant == "motdet" and split != "train":
+            continue                       # motdet shares val and test-dev with mot
         lines = [f"{it.seq}/{it.frame:07d}" if it.source == "mot" else f"det/{it.path.stem}" for it in its]
         name = f"{split}{suffix(variant)}.txt"
         (SPLIT_DIR / name).write_text("\n".join(lines) + "\n")
@@ -193,16 +212,16 @@ def main() -> None:
     ap.add_argument("targets", nargs="+", choices=TARGETS + ["all"])
     ap.add_argument("--splits", nargs="+", default=SPLITS, choices=SPLITS)
     ap.add_argument("--variants", nargs="+", choices=VARIANTS,
-                    help=f"default: mot, plus motdet when data/raw/{DET_TRAIN} exists")
+                    help="default: every variant whose raw data exists (mot, motdet, det)")
     args = ap.parse_args()
     targets = TARGETS if "all" in args.targets else args.targets
-    variants = args.variants or (VARIANTS if (RAW / DET_TRAIN).exists() else ["mot"])
+    variants = args.variants or available_variants()
 
     t0 = time.time()
     log(f"Raw data: {RAW}")
-    log(f"Variants: {', '.join(variants)} (train stride {TRAIN_STRIDE} on MOT)")
+    log("Variants: " + ", ".join(f"{v} (MOT train stride {MOT_TRAIN_STRIDE[v]})" for v in variants))
     mot = load_mot(args.splits)
-    det = load_det() if "motdet" in variants and "train" in args.splits else None
+    det = load_det(args.splits) if {"motdet", "det"} & set(variants) else None
     steps = {"splits": make_splits, "coco": make_coco, "rfdetr": make_rfdetr, "yolo": make_yolo}
     for variant in variants:
         items = build_items(mot, det, variant)

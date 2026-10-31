@@ -1,7 +1,7 @@
 """Sanity checks for the outputs of prepare.py, plus label overlays for visual inspection.
 
 Usage (from the project root):
-    python data/tools/check.py              # all checks, both variants, 6 overlay images per split
+    python data/tools/check.py              # all checks, every available variant, 6 overlay images per split
     python data/tools/check.py --variants mot --draw 12
 """
 from __future__ import annotations
@@ -13,8 +13,8 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-from prepare import RAW, RFDETR_SPLIT, VARIANTS, build_items, load_det, load_mot, suffix
-from visdrone import CLASS_NAMES, DET_TRAIN, SPLITS, list_sequences, log, video_id
+from prepare import RAW, RFDETR_SPLIT, VARIANTS, available_variants, build_items, load_det, load_mot, suffix
+from visdrone import CLASS_NAMES, SPLITS, list_sequences, log, video_id
 
 DATA_DIR = Path(__file__).resolve().parents[1]
 OUT = DATA_DIR / "processed"
@@ -36,7 +36,8 @@ def check_variant(items: dict, variant: str) -> None:
         log(f"Checking {variant} / {split}")
         n_img, n_box = len(its), sum(len(it.objects) for it in its)
 
-        split_file = DATA_DIR / "splits" / (f"{split}{sfx}.txt" if split == "train" else f"{split}.txt")
+        own_list = split == "train" or variant == "det"
+        split_file = DATA_DIR / "splits" / (f"{split}{sfx}.txt" if own_list else f"{split}.txt")
         lines = split_file.read_text().split()
         expect(len(lines) == n_img, f"{split_file.name} has {len(lines):,} images (expected {n_img:,})")
 
@@ -66,7 +67,7 @@ def check_variant(items: dict, variant: str) -> None:
         expect(all(0 <= int(r[0]) <= 9 and all(0 <= float(v) <= 1 for v in r[1:]) for r in rows),
                "yolo class index in 0-9 and coordinates in [0, 1]")
 
-        if split == "train" and variant == "motdet":
+        if split == "train" and variant in ("motdet", "det"):
             held_out = {video_id(s) for sp in ("val", "test-dev") for s in list_sequences(RAW, sp)}
             leaked = [it.name for it in its if it.source == "det" and video_id(it.path.stem) in held_out]
             expect(not leaked, f"no DET image from a MOT val/test-dev video in train ({len(leaked)} found)")
@@ -110,13 +111,13 @@ def main() -> None:
     ap.add_argument("--variants", nargs="+", choices=VARIANTS)
     ap.add_argument("--draw", type=int, default=6, help="overlay images per split (0 to skip)")
     args = ap.parse_args()
-    variants = args.variants or (VARIANTS if (RAW / DET_TRAIN).exists() else ["mot"])
+    variants = args.variants or available_variants()
 
     mot = load_mot(args.splits)
-    det = load_det() if "motdet" in variants and "train" in args.splits else None
+    det = load_det(args.splits) if {"motdet", "det"} & set(variants) else None
     for variant in variants:
         items = build_items(mot, det, variant)
-        if variant != "mot":
+        if variant == "motdet":
             items = {k: v for k, v in items.items() if k == "train"}   # val/test-dev are shared with mot
         check_variant(items, variant)
         if args.draw:

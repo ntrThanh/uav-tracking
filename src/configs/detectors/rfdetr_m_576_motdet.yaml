@@ -1,9 +1,9 @@
-# T3-det: same as T3 (rfdetr_m_576.yaml) but trained on MOT train + VisDrone2019-DET train (variant motdet).
-# Only the training data changes, so the gain over T3 measures the effect of scene diversity on overfitting.
+# T3-det: RF-DETR Medium 576 trained on variant motdet = MOT train (stride 6) + VisDrone2019-DET train.
+# Sized for a 1-2 h run: ~10.5k images x 20 epochs. DET adds scene diversity against the overfitting seen in T3.
 # Run on both GPUs (DDP): bash src/scripts/train_rfdetr.sh src/configs/detectors/rfdetr_m_576_motdet.yaml 0,1
 #
 # Effective batch = batch_size x grad_accum_steps x GPUs = 8 x 1 x 2 = 16 (same as the plan).
-# Measured on 2x L4: 44.5 img/s (about 4.5 min per epoch on MOT only; about 7 min with the 18,528 motdet images), 7.8 GB VRAM per GPU.
+# Measured on 2x L4: 44.5 img/s (motdet: about 4.4 min per epoch incl. validation, 20 epochs = about 1.5 h), 7.8 GB VRAM per GPU.
 # A single GPU reaches only 24.7 img/s at any batch size (GPU util 36-44%), so use both GPUs.
 # On a single GPU, set batch_size=4 grad_accum_steps=4 to keep the effective batch at 16.
 
@@ -14,7 +14,7 @@ dataset_dir: data/processed/rfdetr_motdet
 output_root: runs/det
 
 train:
-  epochs: 60
+  epochs: 20
   batch_size: 8                  # per GPU
   grad_accum_steps: 1
   lr: 1.0e-4
@@ -25,7 +25,7 @@ train:
     min_factor: 0.01             # cosine from 1e-4 down to 1e-6
   warmup_epochs: 1.0             # linear warmup (new 10-class head starts from random init)
   early_stopping: true
-  early_stopping_patience: 15    # cosine needs time; avoid stopping during the early plateau
+  early_stopping_patience: 6     # shorter run; still tolerates the early plateau
   num_workers: 12                # per GPU
   checkpoint_interval: 5
   seed: 0

@@ -25,7 +25,6 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "data" / "tools"))
 from visdrone import CLASS_NAMES  # noqa: E402
 
-DATA = ROOT / "data" / "processed" / "rfdetr"
 OUT = ROOT / "results" / "diagnostics"
 SPLITS = {"train": "train", "val": "valid", "test-dev": "test"}
 
@@ -38,8 +37,8 @@ def subset(images: list[dict], every: int) -> list[dict]:
     """Every n-th image per sequence, so all sequences stay represented."""
     by_seq: dict[str, list[dict]] = {}
     for im in images:
-        by_seq.setdefault(im["seq"], []).append(im)
-    return [im for seq in sorted(by_seq) for im in sorted(by_seq[seq], key=lambda x: x["frame"])[::every]]
+        by_seq.setdefault(im.get("seq") or "det", []).append(im)   # DET images have no sequence
+    return [im for seq in sorted(by_seq) for im in sorted(by_seq[seq], key=lambda x: x.get("frame") or x["id"])[::every]]
 
 
 def predict(model, split_dir: Path, images: list[dict], batch: int, threshold: float) -> list[dict]:
@@ -88,6 +87,8 @@ def main() -> None:
     ap.add_argument("--resolution", type=int, default=576)
     ap.add_argument("--train-every", type=int, default=10, help="every n-th train frame per sequence")
     ap.add_argument("--test-every", type=int, default=5, help="every n-th test-dev frame per sequence")
+    ap.add_argument("--data", type=Path, default=ROOT / "data" / "processed" / "rfdetr",
+                    help="RF-DETR layout to evaluate on (rfdetr = MOT, rfdetr_det = DET)")
     ap.add_argument("--batch", type=int, default=16)
     ap.add_argument("--threshold", type=float, default=0.01)
     args = ap.parse_args()
@@ -98,14 +99,14 @@ def main() -> None:
     log(f"Checkpoint {args.checkpoint} ({args.tag}), resolution {args.resolution}")
 
     OUT.mkdir(parents=True, exist_ok=True)
-    summary = {"checkpoint": str(args.checkpoint), "tag": args.tag, "splits": {}}
+    summary = {"checkpoint": str(args.checkpoint), "tag": args.tag, "data": str(args.data), "splits": {}}
     for split, folder in SPLITS.items():
-        ann = DATA / folder / "_annotations.coco.json"
+        ann = args.data / folder / "_annotations.coco.json"
         images = json.load(open(ann))["images"]
         every = {"train": args.train_every, "val": 1, "test-dev": args.test_every}[split]
         images = subset(images, every)
         t0 = time.time()
-        res = predict(model, DATA / folder, images, args.batch, args.threshold)
+        res = predict(model, args.data / folder, images, args.batch, args.threshold)
         m = coco_eval(ann, res, [im["id"] for im in images])
         m.update(n_images=len(images), n_dets=len(res), seconds=round(time.time() - t0))
         summary["splits"][split] = m

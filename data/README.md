@@ -55,41 +55,45 @@ data/
 │   └── check.py            # kiểm tra chéo các định dạng và vẽ nhãn lên ảnh
 ├── splits/                 # danh sách ảnh dùng chung (đưa lên git)
 │   ├── train.txt           # 12.114 frame MOT, lấy mẫu stride 2
-│   ├── train_motdet.txt    # 18.528 ảnh: train.txt + 6.414 ảnh DET
+│   ├── train_motdet.txt    # 10.476 ảnh: MOT stride 6 + 6.414 ảnh DET
+│   ├── {train,val,test-dev}_det.txt  # biến thể det: 6.414 / 548 / 1.610 ảnh DET
 │   ├── det_train_excluded.txt  # 57 ảnh DET bị loại vì trùng video với MOT val/test-dev
 │   ├── val.txt             # 2.846 frame
 │   └── test-dev.txt        # 6.635 frame
 ├── raw/                    # dữ liệu gốc đã giải nén (không đưa lên git)
 │   ├── VisDrone2019-MOT-{train,val,test-dev}/{sequences,annotations}
-│   └── VisDrone2019-DET-train/{images,annotations}
+│   └── VisDrone2019-DET-{train,val,test-dev}/{images,annotations}
 └── processed/              # sinh ra bởi prepare.py (không đưa lên git)
-    ├── coco/  coco_motdet/       # {train,val,test-dev}.json
-    ├── rfdetr/  rfdetr_motdet/   # {train,valid,test}/
-    ├── yolo/  yolo_motdet/       # {train,val,test-dev}/{images,labels} + visdrone.yaml
+    ├── coco/  coco_motdet/  coco_det/        # {train,val,test-dev}.json
+    ├── rfdetr/  rfdetr_motdet/  rfdetr_det/  # {train,valid,test}/
+    ├── yolo/  yolo_motdet/  yolo_det/        # {train,val,test-dev}/{images,labels} + visdrone.yaml
     ├── mot/{train,val,test-dev}/<seq>/{gt,img1,seqinfo.ini}
     └── check/              # ảnh vẽ nhãn để kiểm tra bằng mắt
 ```
 
 ## 3. Cách sử dụng
 
-Tải VisDrone2019-MOT (train, val, test-dev) và VisDrone2019-DET trainset (Task 1, 1,44 GB) từ [VisDrone-Dataset](https://github.com/VisDrone/VisDrone-Dataset), giải nén vào `data/raw/`. Sau đó chạy từ thư mục gốc của dự án:
+Tải VisDrone2019-MOT (train, val, test-dev) và VisDrone2019-DET train, val, test-dev (Task 1) từ [VisDrone-Dataset](https://github.com/VisDrone/VisDrone-Dataset), giải nén vào `data/raw/`. Sau đó chạy từ thư mục gốc của dự án:
 
 ```bash
 python data/tools/det_overlap.py     # chỉ cần khi có DET; tạo splits/det_train_excluded.txt
-python data/tools/prepare.py all     # khoảng 1 phút, sinh cả hai biến thể mot và motdet
+python data/tools/prepare.py all     # khoảng 1 phút, sinh mọi biến thể có đủ dữ liệu gốc
 python data/tools/check.py           # phải in ra "All checks passed"
 ```
 
 Có thể tạo riêng từng định dạng hoặc biến thể, ví dụ `python data/tools/prepare.py coco rfdetr --variants mot`. Nếu chưa tải DET, công cụ chỉ sinh biến thể `mot`. Ảnh trong `processed/` là symlink trỏ về `raw/`, nên không tốn thêm dung lượng. Công cụ chỉ cần Python 3.10 trở lên và Pillow.
 
-### Hai biến thể dữ liệu train
+### Ba biến thể dữ liệu cho detector
 
-| Biến thể | Tập train | Số ảnh | Số box | Đầu ra |
+| Biến thể | Train | Val | Test | Đầu ra |
 |---|---|---|---|---|
-| `mot` | VisDrone2019-MOT train, stride 2 | 12.114 | 553.391 | `processed/{coco,rfdetr,yolo}/` |
-| `motdet` | `mot` + VisDrone2019-DET train đã lọc | 18.528 | 891.676 | `processed/{coco,rfdetr,yolo}_motdet/` |
+| `mot` | MOT train stride 2 (12.114 ảnh, 553.391 box) | MOT val | MOT test-dev | `processed/{coco,rfdetr,yolo}/` |
+| `motdet` | MOT train stride 6 + DET train (10.476 ảnh) | MOT val | MOT test-dev | `processed/{coco,rfdetr,yolo}_motdet/` |
+| `det` | DET train (6.414 ảnh, 338.285 box) | DET val (548 ảnh) | DET test-dev (1.610 ảnh) | `processed/{coco,rfdetr,yolo}_det/` |
 
-Val và test-dev của hai biến thể giống hệt nhau (đều là MOT). Biến thể `motdet` ra đời sau khi chẩn đoán cho thấy RF-DETR train trên `mot` bị overfit: 12.114 frame chỉ đến từ 56 video, mAP train tăng từ 0,391 lên 0,580 trong khi mAP val giảm từ 0,233 xuống 0,178 (xem `results/diagnostics/`). DET train bổ sung 6.414 ảnh từ hàng nghìn cảnh khác nhau với cùng 10 lớp. Cả ba detector phải dùng cùng một biến thể để so sánh công bằng.
+Ground truth cho tracking (`processed/mot/`) luôn lấy từ VisDrone2019-MOT, bất kể detector được train trên biến thể nào. Với biến thể `det`, danh sách ảnh nằm trong `splits/{train,val,test-dev}_det.txt`.
+
+Biến thể `motdet` và `det` ra đời sau khi chẩn đoán cho thấy RF-DETR train trên `mot` bị overfit: 12.114 frame chỉ đến từ 56 video, mAP train tăng từ 0,391 lên 0,580 trong khi mAP val giảm từ 0,233 xuống 0,178 (xem `results/diagnostics/`). DET bổ sung hàng nghìn cảnh khác nhau với cùng 10 lớp; biến thể `det` còn giúp train nhanh (khoảng 1,7 giờ cho 40 epoch RF-DETR trên 2 GPU) và cho mAP so sánh được với benchmark VisDrone-DET. Cả ba detector phải dùng cùng một biến thể để so sánh công bằng.
 
 Trước khi gộp, `det_overlap.py` loại 57 ảnh DET có cùng mã video với MOT val (45 ảnh từ 4 video) hoặc test-dev (12 ảnh từ 2 video), vì chúng là frame của chính các video dùng để đánh giá. Công cụ còn so khớp perceptual hash (dHash 64 bit) với các frame val/test-dev; kiểm tra bằng mắt cho thấy các cặp có khoảng cách 1–8 đều là cảnh khác nhau có bố cục tương tự, nên mặc định chỉ loại thêm ảnh có hash trùng hoàn toàn (không có trường hợp nào ngoài 57 ảnh trên).
 

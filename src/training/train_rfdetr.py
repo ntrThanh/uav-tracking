@@ -173,7 +173,7 @@ def main() -> None:
         # Lightning swallows Ctrl+C and returns normally; checkpoint_best_total.pth is only written on a full finish.
         if not (run_dir / "checkpoint_best_total.pth").exists():
             status = "interrupted"
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, SystemExit):     # Lightning exits with SystemExit after handling Ctrl+C
         status = "interrupted"
         raise
     except Exception:

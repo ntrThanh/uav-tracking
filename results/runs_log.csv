@@ -1,0 +1,6 @@
+run_id,date,user,model,resolution,data,epochs,batch,lr,gpu,duration_h,best_checkpoint,output_dir,status,notes
+T3_rfdetr_m_576,2026-10-30 09:59,vpcuser,rfdetr_medium,576,data/processed/rfdetr,60,4x4,0.0001,1x NVIDIA L4,0.03,,runs/det/T3_rfdetr_m_576,interrupted,stopped by user after ~2 min (old 1-GPU config)
+T3_rfdetr_m_576,2026-10-30 10:35,vpcuser,rfdetr_medium,576,data/processed/rfdetr,60,8x1x2gpu,0.0001,2x NVIDIA L4,0.35,,runs/det/_stopped/T3_rfdetr_m_576_constlr,interrupted,stopped at epoch 4: constant lr (library default lr_drop=100); moved to runs/det/_stopped/T3_rfdetr_m_576_constlr
+T3_rfdetr_m_576,2026-10-30 11:59,vpcuser,rfdetr_medium,576,data/processed/rfdetr,60,8x1x2gpu,0.0001,2x NVIDIA L4,1.36,runs/det/T3_rfdetr_m_576/checkpoint_best_total.pth,runs/det/T3_rfdetr_m_576,finished,
+T3det_rfdetr_m_576_motdet,2026-10-30 14:02,vpcuser,rfdetr_medium,576,data/processed/rfdetr_motdet,60,8x1x2gpu,0.0001,2x NVIDIA L4,0.01,,runs/det/T3det_rfdetr_m_576_motdet,interrupted,stopped by user after ~1 min; switched to DET-only training
+T3det_rfdetr_m_576_det,2026-10-30 15:25,vpcuser,rfdetr_medium,576,data/processed/rfdetr_det,40,8x1x2gpu,0.0001,2x NVIDIA L4,1.22,runs/det/T3det_rfdetr_m_576_det/checkpoint_best_total.pth,runs/det/T3det_rfdetr_m_576_det,finished,
