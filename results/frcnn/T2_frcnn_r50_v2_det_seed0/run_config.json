@@ -1,0 +1,16 @@
+{
+  "epochs": 24,
+  "batch_size": 4,
+  "eval_batch_size": 4,
+  "workers": 4,
+  "min_size": 800,
+  "max_size": 1333,
+  "amp": true,
+  "seed": 0,
+  "lr": 0.005,
+  "train_sha256": "b209b698ac0e7283cf1ca3d24a5935cb2d22d375b7a79ca7731a634c5db87403",
+  "val_sha256": "b1745092d15d6458134bac4d38477c723585923f30042e4933c31c7c9af56533",
+  "workflow_sha256": "6b26513defbc61ae740f39a1be760c8fb37e13fe2a21be7ea73033cb880e6d38",
+  "torch": "2.11.0+cu130",
+  "torchvision": "0.26.0+cu130"
+}

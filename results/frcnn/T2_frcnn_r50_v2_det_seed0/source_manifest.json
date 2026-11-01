@@ -1,0 +1,9 @@
+{
+  "base_commit": "950379c83ce853c8dce1d0110907a0753cc6f007",
+  "files_sha256": {
+    "data/tools/visdrone.py": "b55b7873153bd159c0e03d785e6479bcaf570cf6df808a4048260e25cb9c792c",
+    "data/tools/prepare.py": "c174d20fd64f0d49de5071664475e71e416a6d5f7145cf942a36aad126a5e877",
+    "data/splits/det_train_excluded.txt": "bd58e0bb6acf94de85a79d7385077920bf4b490df94f68e3f656d0f519eaddd0",
+    "src/training/frcnn_colab.py": "6b26513defbc61ae740f39a1be760c8fb37e13fe2a21be7ea73033cb880e6d38"
+  }
+}

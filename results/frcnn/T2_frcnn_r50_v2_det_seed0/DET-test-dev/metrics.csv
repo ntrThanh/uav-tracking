@@ -1,0 +1,2 @@
+mAP50_95,mAP50,mAP75,AP_small,AP_medium,AP_large,AR_500,protocol,dataset,n_images,checkpoint_epoch
+0.21882542055866763,0.37748582112690027,0.2230756741555658,0.11876749953510964,0.3316380145764226,0.43033903063983253,0.3371153227411542,"COCO bbox maxDets=[1,100,500]; no ignored-region filtering; fractions 0..1",VisDrone2019-DET-test-dev,1610,17
