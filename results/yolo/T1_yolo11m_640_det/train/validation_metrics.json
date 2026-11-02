@@ -1,0 +1,14 @@
+{
+  "dataset_variant": "det",
+  "split": "val",
+  "mAP50_95": 0.2748845379893423,
+  "mAP50": 0.4629058011448251,
+  "mAP75": 0.27506097107755917,
+  "precision_mean": 0.5779056370980017,
+  "recall_mean": 0.453985122737255,
+  "best_epoch_from_train_csv": 60,
+  "best_map_train_csv": 0.27337,
+  "n_train_images": 6414,
+  "n_val_images": 548,
+  "n_test_dev_images": 1610
+}

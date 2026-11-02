@@ -1,0 +1,69 @@
+{
+  "timestamp_utc": "2026-11-02T15:13:33.922797+00:00",
+  "dataset": "tiendq/visdrone-mot-det-converted",
+  "split": "test-dev",
+  "dataset_root": "/kaggle/input/datasets/tiendq/visdrone-mot-det-converted/uav_tracking_mot_det",
+  "annotations": "/kaggle/input/datasets/tiendq/visdrone-mot-det-converted/uav_tracking_mot_det/data/processed/coco_det/test-dev.json",
+  "sample_size": 1610,
+  "total_images_in_split": 1610,
+  "sample_seed": 0,
+  "pretrained_checkpoint": "yolo11m.pt",
+  "best_checkpoint": "/kaggle/input/datasets/tiendq/result-train-det-yolo11m-80e/T1_yolo11m_640_det_artifacts/T1_yolo11m_640_det/weights/best.pt",
+  "best_checkpoint_sha256": "514f922681de0636a152061f872f33baedea8cfe2f0d69075d4a06dae6df1632",
+  "imgsz": 640,
+  "conf_eval": 0.001,
+  "conf_visual": 0.25,
+  "iou_nms": 0.7,
+  "max_detections_inference": 1000,
+  "max_detections_cocoeval": 1000,
+  "common_classes": {
+    "1": "person",
+    "2": "bicycle",
+    "3": "car",
+    "4": "truck",
+    "5": "bus",
+    "6": "motorcycle"
+  },
+  "gt_mapping": {
+    "1": 1,
+    "2": 1,
+    "3": 2,
+    "4": 3,
+    "5": 3,
+    "6": 4,
+    "9": 5,
+    "10": 6
+  },
+  "excluded_visdrone_class_ids": [
+    7,
+    8
+  ],
+  "ignored_prediction_policy": "Exclude detections with intersection/prediction-area >=0.5 against ignored regions and VisDrone classes 7/8",
+  "important_note": "Custom merged-six-class metric, NOT official VisDrone ten-class mAP",
+  "metrics": {
+    "pretrained": {
+      "model": "COCO pretrained",
+      "mAP50_95": 0.0860697831853268,
+      "mAP50": 0.1468595550875616,
+      "AP_small": 0.028506865490434827,
+      "AR1000": 0.16308480053935687,
+      "n_images": 1610,
+      "seconds": 81.19,
+      "img_per_sec": 19.83
+    },
+    "finetuned": {
+      "model": "VisDrone fine-tuned",
+      "mAP50_95": 0.2605467122696555,
+      "mAP50": 0.4396854250266447,
+      "AP_small": 0.13096244044952882,
+      "AR1000": 0.3528091877700221,
+      "n_images": 1610,
+      "seconds": 65.97,
+      "img_per_sec": 24.41
+    }
+  },
+  "gpu": "Tesla T4",
+  "torch": "2.11.0+cu128",
+  "ultralytics": "8.4.198",
+  "python": "3.13.15"
+}

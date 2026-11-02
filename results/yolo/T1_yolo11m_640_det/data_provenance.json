@@ -1,0 +1,13 @@
+{
+  "source_kaggle_dataset": "tiendq/visdrone-mot-det-converted",
+  "variant": "det",
+  "original_preprocessing": "ntrThanh/uav-tracking/data/tools/prepare.py",
+  "raw_data": "VisDrone2019-MOT / VisDrone2019-DET",
+  "images": {
+    "train": 6414,
+    "val": 548,
+    "test-dev": 1610
+  },
+  "converted_dataset_path": "/kaggle/input/datasets/tiendq/visdrone-mot-det-converted/uav_tracking_mot_det",
+  "restore_method": "Working YOLO symlinks restored from links_manifest.json. No raw image copies."
+}
