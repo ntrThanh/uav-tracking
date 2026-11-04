@@ -1,0 +1,119 @@
+{
+  "experiment": "qualitative_3_detectors_same_frames",
+  "split": "VisDrone2019-MOT-test-dev",
+  "sequence": "uav0000009_03358_v",
+  "sequence_index": 0,
+  "frame_ids": [
+    1,
+    44,
+    88,
+    131,
+    175,
+    219
+  ],
+  "dataset_source": "https://www.kaggle.com/datasets/tiendq/visdrone-mot-det-converted",
+  "gt_source": "data/processed/coco/test-dev.json, repo prepare.py",
+  "repo": "https://github.com/ntrThanh/uav-tracking.git",
+  "repo_commit": "7a23f4c4f0af306e497391f32f2c04f441958a98",
+  "checkpoints": {
+    "yolo": {
+      "path": "/kaggle/input/models/tiendq/checkpoint-det/pytorch/default/1/best_yolo11m.pt",
+      "sha256": "514f922681de0636a152061f872f33baedea8cfe2f0d69075d4a06dae6df1632"
+    },
+    "frcnn": {
+      "path": "/kaggle/input/models/tiendq/checkpoint-det/pytorch/default/1/best_frcnn.pt",
+      "sha256": "2fd6534ec3ff58e7d8b7c554d228a90fb2b56e79ac53479b5fa4c1287fb29113"
+    },
+    "rfdetr": {
+      "path": "/kaggle/input/models/tiendq/checkpoint-det/pytorch/default/1/best_ema.pth",
+      "sha256": "b61fa76289f5a50039c9f79bd38a51e3ef5da3eb503b3a7a9a547b2b940e288d"
+    }
+  },
+  "inference": {
+    "score_thresh": 0.25,
+    "yolo_imgsz": 640,
+    "frcnn_min_size": 800,
+    "frcnn_max_size": 1333,
+    "rfdetr_model": "RFDETRMedium",
+    "rfdetr_resolution": 576,
+    "max_det_yolo": 1000,
+    "max_det_frcnn": 1000,
+    "max_det_rfdetr": 300,
+    "note": "Qualitative visualization; detection counts are not mAP scores"
+  },
+  "versions": {
+    "python": "3.13.16",
+    "torch": "2.11.0+cu130",
+    "torchvision": "0.26.0+cu130",
+    "ultralytics": "8.4.197",
+    "rfdetr": "1.11.2"
+  },
+  "frames": [
+    {
+      "image": "comparison_01_uav0000009_03358_v_frame0000001.jpg",
+      "sequence": "uav0000009_03358_v",
+      "frame_id": 1,
+      "image_file": "VisDrone2019-MOT-test-dev/sequences/uav0000009_03358_v/0000001.jpg",
+      "n_gt": 17,
+      "n_yolo": 21,
+      "n_frcnn": 22,
+      "n_rfdetr": 21,
+      "n_ignored": 0
+    },
+    {
+      "image": "comparison_02_uav0000009_03358_v_frame0000044.jpg",
+      "sequence": "uav0000009_03358_v",
+      "frame_id": 44,
+      "image_file": "VisDrone2019-MOT-test-dev/sequences/uav0000009_03358_v/0000044.jpg",
+      "n_gt": 20,
+      "n_yolo": 22,
+      "n_frcnn": 25,
+      "n_rfdetr": 18,
+      "n_ignored": 0
+    },
+    {
+      "image": "comparison_03_uav0000009_03358_v_frame0000088.jpg",
+      "sequence": "uav0000009_03358_v",
+      "frame_id": 88,
+      "image_file": "VisDrone2019-MOT-test-dev/sequences/uav0000009_03358_v/0000088.jpg",
+      "n_gt": 59,
+      "n_yolo": 72,
+      "n_frcnn": 71,
+      "n_rfdetr": 67,
+      "n_ignored": 0
+    },
+    {
+      "image": "comparison_04_uav0000009_03358_v_frame0000131.jpg",
+      "sequence": "uav0000009_03358_v",
+      "frame_id": 131,
+      "image_file": "VisDrone2019-MOT-test-dev/sequences/uav0000009_03358_v/0000131.jpg",
+      "n_gt": 90,
+      "n_yolo": 135,
+      "n_frcnn": 122,
+      "n_rfdetr": 109,
+      "n_ignored": 3
+    },
+    {
+      "image": "comparison_05_uav0000009_03358_v_frame0000175.jpg",
+      "sequence": "uav0000009_03358_v",
+      "frame_id": 175,
+      "image_file": "VisDrone2019-MOT-test-dev/sequences/uav0000009_03358_v/0000175.jpg",
+      "n_gt": 81,
+      "n_yolo": 88,
+      "n_frcnn": 86,
+      "n_rfdetr": 97,
+      "n_ignored": 1
+    },
+    {
+      "image": "comparison_06_uav0000009_03358_v_frame0000219.jpg",
+      "sequence": "uav0000009_03358_v",
+      "frame_id": 219,
+      "image_file": "VisDrone2019-MOT-test-dev/sequences/uav0000009_03358_v/0000219.jpg",
+      "n_gt": 67,
+      "n_yolo": 81,
+      "n_frcnn": 82,
+      "n_rfdetr": 104,
+      "n_ignored": 1
+    }
+  ]
+}

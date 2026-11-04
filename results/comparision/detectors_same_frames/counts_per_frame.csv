@@ -1,0 +1,7 @@
+image,sequence,frame_id,image_file,n_gt,n_yolo,n_frcnn,n_rfdetr,n_ignored
+comparison_01_uav0000009_03358_v_frame0000001.jpg,uav0000009_03358_v,1,VisDrone2019-MOT-test-dev/sequences/uav0000009_03358_v/0000001.jpg,17,21,22,21,0
+comparison_02_uav0000009_03358_v_frame0000044.jpg,uav0000009_03358_v,44,VisDrone2019-MOT-test-dev/sequences/uav0000009_03358_v/0000044.jpg,20,22,25,18,0
+comparison_03_uav0000009_03358_v_frame0000088.jpg,uav0000009_03358_v,88,VisDrone2019-MOT-test-dev/sequences/uav0000009_03358_v/0000088.jpg,59,72,71,67,0
+comparison_04_uav0000009_03358_v_frame0000131.jpg,uav0000009_03358_v,131,VisDrone2019-MOT-test-dev/sequences/uav0000009_03358_v/0000131.jpg,90,135,122,109,3
+comparison_05_uav0000009_03358_v_frame0000175.jpg,uav0000009_03358_v,175,VisDrone2019-MOT-test-dev/sequences/uav0000009_03358_v/0000175.jpg,81,88,86,97,1
+comparison_06_uav0000009_03358_v_frame0000219.jpg,uav0000009_03358_v,219,VisDrone2019-MOT-test-dev/sequences/uav0000009_03358_v/0000219.jpg,67,81,82,104,1
