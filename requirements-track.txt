@@ -1,0 +1,12 @@
+# Tracking env `track` (Python 3.11). The *_lib trackers use boxmot, deep-sort-realtime and sort-tracker-py.
+numpy==2.4.6
+scipy==1.17.1
+opencv-python==4.11.0.86
+PyYAML==6.0.3
+torch==2.15.0
+torchvision==0.29.2
+boxmot==26.0.0
+deep-sort-realtime==1.3.2
+filterpy==1.4.5
+sort-tracker-py==1.0.2
+pytest==9.2.0

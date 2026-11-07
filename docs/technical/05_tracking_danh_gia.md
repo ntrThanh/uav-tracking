@@ -2,15 +2,15 @@
 
 ## 5.1. Năm tracker
 
-| Tracker | Thư viện | Liên kết dựa trên | ReID | Bù chuyển động camera (GMC) |
-|---|---|---|:-:|:-:|
-| SORT | `sort.py` (abewley), bọc trong `src/trackers` | Kalman + IoU, Hungarian | | |
-| DeepSORT | `deep_sort_realtime` | Kalman + IoU + đặc trưng ngoại hình | ✓ | |
-| ByteTrack | `boxmot` | Kalman + IoU, liên kết hai tầng box score cao và thấp | | |
-| OC-SORT | `boxmot` | Kalman lấy quan sát làm trung tâm, bù quán tính hướng chuyển động | | |
-| BoT-SORT | `boxmot` | ByteTrack + ReID + GMC | ✓ | ✓ |
+| Tracker | Liên kết dựa trên | ReID | Bù chuyển động camera (GMC) |
+|---|---|:-:|:-:|
+| SORT | Kalman + IoU, Hungarian | | |
+| DeepSORT | Kalman + IoU + đặc trưng ngoại hình | ✓ | |
+| ByteTrack | Kalman + IoU, liên kết hai tầng box score cao và thấp | | |
+| OC-SORT | Kalman lấy quan sát làm trung tâm, bù quán tính hướng chuyển động | | |
+| BoT-SORT | ByteTrack + ReID + GMC | ✓ | ✓ |
 
-`boxmot` không có SORT và DeepSORT gốc nên hai tracker này dùng thư viện riêng. DeepSORT và BoT-SORT dùng chung trọng số ReID `osnet_x0_25_msmt17.pt` để so sánh được với nhau.
+Mỗi tracker có hai phiên bản trong `src/trackers/`: bản nhóm tự cài đặt, dùng chung thành phần Kalman, ghép cặp và vòng đời track, và bản dùng thư viện với hậu tố `_lib`. Kiến trúc và cách thêm tracker mới nằm trong [src/trackers/README.md](../../src/trackers/README.md). DeepSORT và BoT-SORT dùng chung trọng số ReID `osnet_x0_25_msmt17.pt` để so sánh được với nhau; riêng mạng OSNet được nạp qua `boxmot`.
 
 Ý nghĩa của từng tracker trong so sánh: SORT là mốc đơn giản nhất. ByteTrack cho thấy lợi ích của việc giữ cả box score thấp, rất quan trọng khi vật thể nhỏ thường có score thấp. OC-SORT xử lý tốt đối tượng bị che lâu và chuyển động phi tuyến. DeepSORT và BoT-SORT cho thấy đặc trưng ngoại hình có giúp ích với đối tượng chỉ vài chục pixel hay không. BoT-SORT còn bù chuyển động camera, phù hợp với drone.
 
