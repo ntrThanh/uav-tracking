@@ -1,0 +1,12 @@
+# BoT-SORT = ByteTrack + ReID + camera motion compensation. det_thresh is track_high_thresh.
+det_thresh: 0.5
+track_low_thresh: 0.1
+new_track_thresh: 0.6
+match_thresh: 0.8
+track_buffer: 30
+proximity_thresh: 0.5
+appearance_thresh: 0.25
+with_reid: true
+cmc_method: sof
+cmc_downscale: 2
+reid_weights: weights/pretrained/osnet_x0_25_msmt17.pt

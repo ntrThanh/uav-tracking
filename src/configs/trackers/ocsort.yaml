@@ -1,0 +1,8 @@
+# OC-SORT
+det_thresh: 0.5
+max_age: 30
+min_hits: 3
+iou_threshold: 0.3
+delta_t: 3
+inertia: 0.2
+asso_func: iou

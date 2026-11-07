@@ -1,0 +1,8 @@
+# DeepSORT. Shares its ReID weights with BoT-SORT.
+det_thresh: 0.4
+max_age: 30
+n_init: 3
+max_iou_distance: 0.7
+max_cosine_distance: 0.2
+nn_budget: 100
+reid_weights: weights/pretrained/osnet_x0_25_msmt17.pt
