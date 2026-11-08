@@ -1,0 +1,40 @@
+{
+  "det": "yolo11m",
+  "split": "test-dev",
+  "seqs": [
+    "uav0000370_00001_v",
+    "uav0000073_00600_v",
+    "uav0000073_04464_v"
+  ],
+  "frames": 905,
+  "warmup": 50,
+  "repeats": [
+    {
+      "ms_per_frame": 8.455214167954372,
+      "ms_median": 8.434801000021253
+    },
+    {
+      "ms_per_frame": 8.435699166855969,
+      "ms_median": 8.41482900000301
+    },
+    {
+      "ms_per_frame": 8.485889211052376,
+      "ms_median": 8.46234599998752
+    }
+  ],
+  "ms_per_frame": 8.455214167954372,
+  "fps": 118.27021529390034,
+  "settings": {
+    "imgsz": 640,
+    "nms_iou": 0.7,
+    "max_det": 1000,
+    "precision": "fp32"
+  },
+  "environment": {
+    "host": "celldata",
+    "python": "3.11.17",
+    "torch": "2.15.0+cu132",
+    "cpu": "x86_64",
+    "gpu": "NVIDIA L4"
+  }
+}

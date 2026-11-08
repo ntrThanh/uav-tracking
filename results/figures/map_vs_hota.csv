@@ -1,0 +1,16 @@
+det,tracker,mAP50_95_track5,HOTA
+yolo11m,sort_thr05,35.71,45.32
+yolo11m,deepsort_thr04,35.71,46.38
+yolo11m,bytetrack_thr06,35.71,47.09
+yolo11m,ocsort_thr05,35.71,46.51
+yolo11m,botsort_thr06,35.71,51.67
+frcnn_r50,sort_thr06,33.82,45.10
+frcnn_r50,deepsort_thr08,33.82,45.51
+frcnn_r50,bytetrack_thr08,33.82,46.64
+frcnn_r50,ocsort_thr06,33.82,46.22
+frcnn_r50,botsort_thr08,33.82,51.68
+rfdetr_m,sort_thr04,33.91,43.11
+rfdetr_m,deepsort_thr04,33.91,42.87
+rfdetr_m,bytetrack_thr06,33.91,45.97
+rfdetr_m,ocsort_thr04,33.91,43.78
+rfdetr_m,botsort_thr05,33.91,49.85

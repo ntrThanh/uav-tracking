@@ -1,0 +1,16 @@
+det,run,class,HOTA
+yolo11m,botsort_thr06,pedestrian,36.74
+yolo11m,botsort_thr06,car,61.04
+yolo11m,botsort_thr06,van,44.55
+yolo11m,botsort_thr06,truck,51.93
+yolo11m,botsort_thr06,bus,64.08
+frcnn_r50,botsort_thr08,pedestrian,42.17
+frcnn_r50,botsort_thr08,car,61.56
+frcnn_r50,botsort_thr08,van,46.51
+frcnn_r50,botsort_thr08,truck,51.77
+frcnn_r50,botsort_thr08,bus,56.39
+rfdetr_m,botsort_thr05,pedestrian,37.7
+rfdetr_m,botsort_thr05,car,59.72
+rfdetr_m,botsort_thr05,van,44.18
+rfdetr_m,botsort_thr05,truck,50.6
+rfdetr_m,botsort_thr05,bus,57.05

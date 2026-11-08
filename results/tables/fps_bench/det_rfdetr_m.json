@@ -1,0 +1,40 @@
+{
+  "det": "rfdetr_m",
+  "split": "test-dev",
+  "seqs": [
+    "uav0000370_00001_v",
+    "uav0000073_00600_v",
+    "uav0000073_04464_v"
+  ],
+  "frames": 905,
+  "warmup": 50,
+  "repeats": [
+    {
+      "ms_per_frame": 30.576360088401074,
+      "ms_median": 25.734978000173214
+    },
+    {
+      "ms_per_frame": 30.47075292375762,
+      "ms_median": 25.71728699990672
+    },
+    {
+      "ms_per_frame": 30.44871907955437,
+      "ms_median": 25.703829000121914
+    }
+  ],
+  "ms_per_frame": 30.47075292375762,
+  "fps": 32.8183554407779,
+  "settings": {
+    "resolution": 576,
+    "nms": null,
+    "max_det": 300,
+    "precision": "fp32"
+  },
+  "environment": {
+    "host": "celldata",
+    "python": "3.11.17",
+    "torch": "2.15.0+cu132",
+    "cpu": "x86_64",
+    "gpu": "NVIDIA L4"
+  }
+}

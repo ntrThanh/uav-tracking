@@ -1,0 +1,42 @@
+{
+  "det": "frcnn_r50",
+  "split": "test-dev",
+  "seqs": [
+    "uav0000370_00001_v",
+    "uav0000073_00600_v",
+    "uav0000073_04464_v"
+  ],
+  "frames": 905,
+  "warmup": 50,
+  "repeats": [
+    {
+      "ms_per_frame": 71.99031348176635,
+      "ms_median": 70.4109650000646
+    },
+    {
+      "ms_per_frame": 72.67110273038617,
+      "ms_median": 70.58210299987877
+    },
+    {
+      "ms_per_frame": 72.94321877900416,
+      "ms_median": 70.76304299994263
+    }
+  ],
+  "ms_per_frame": 72.67110273038617,
+  "fps": 13.760627848321713,
+  "settings": {
+    "min_size": 800,
+    "max_size": 1333,
+    "nms_iou": 0.5,
+    "max_det": 1000,
+    "checkpoint_epoch": 16,
+    "precision": "fp32"
+  },
+  "environment": {
+    "host": "celldata",
+    "python": "3.11.17",
+    "torch": "2.15.0+cu132",
+    "cpu": "x86_64",
+    "gpu": "NVIDIA L4"
+  }
+}

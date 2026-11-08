@@ -1,0 +1,234 @@
+{
+  "det": "yolo11m",
+  "split": "test-dev",
+  "seqs": [
+    "uav0000370_00001_v",
+    "uav0000073_00600_v",
+    "uav0000073_04464_v"
+  ],
+  "frames": 905,
+  "runs": {
+    "botsort": {
+      "tracker": "botsort",
+      "repeats": [
+        {
+          "association_seconds": 3.1743675419988904,
+          "front_end_seconds": 26.559695016000433
+        },
+        {
+          "association_seconds": 3.175100285001008,
+          "front_end_seconds": 27.515934570999434
+        },
+        {
+          "association_seconds": 3.182208789997958,
+          "front_end_seconds": 26.90687539599844
+        }
+      ],
+      "association_seconds": 3.175100285001008,
+      "front_end_seconds": 26.90687539599844,
+      "FPS_tracker": 285.0303671588479,
+      "FPS_tracker_front_end": 30.08446019626368
+    },
+    "botsort_thr06": {
+      "tracker": "botsort",
+      "det_thresh": 0.6,
+      "repeats": [
+        {
+          "association_seconds": 2.3940944569983458,
+          "front_end_seconds": 24.93470771999955
+        },
+        {
+          "association_seconds": 2.3724024409989397,
+          "front_end_seconds": 24.886443285004816
+        },
+        {
+          "association_seconds": 2.3942235960037124,
+          "front_end_seconds": 25.051966816999993
+        }
+      ],
+      "association_seconds": 2.3940944569983458,
+      "front_end_seconds": 24.93470771999955,
+      "FPS_tracker": 378.0134895490572,
+      "FPS_tracker_front_end": 33.11524574471545
+    },
+    "bytetrack": {
+      "tracker": "bytetrack",
+      "repeats": [
+        {
+          "association_seconds": 1.7485793849978108,
+          "front_end_seconds": 0.0018032680015949154
+        },
+        {
+          "association_seconds": 1.7478501729954132,
+          "front_end_seconds": 0.0018154689996663365
+        },
+        {
+          "association_seconds": 1.7420030099976884,
+          "front_end_seconds": 0.0018024670027898537
+        }
+      ],
+      "association_seconds": 1.7478501729954132,
+      "front_end_seconds": 0.0018032680015949154,
+      "FPS_tracker": 517.7789343631429,
+      "FPS_tracker_front_end": 517.2452891495485
+    },
+    "bytetrack_thr06": {
+      "tracker": "bytetrack",
+      "det_thresh": 0.6,
+      "repeats": [
+        {
+          "association_seconds": 1.3030099180007255,
+          "front_end_seconds": 0.0017467920044964558
+        },
+        {
+          "association_seconds": 1.3054950409975845,
+          "front_end_seconds": 0.0017583360024673311
+        },
+        {
+          "association_seconds": 1.3053782350029906,
+          "front_end_seconds": 0.001730954998265588
+        }
+      ],
+      "association_seconds": 1.3053782350029906,
+      "front_end_seconds": 0.0017467920044964558,
+      "FPS_tracker": 693.2856514172896,
+      "FPS_tracker_front_end": 692.3591709294204
+    },
+    "deepsort": {
+      "tracker": "deepsort",
+      "repeats": [
+        {
+          "association_seconds": 8.652140228998633,
+          "front_end_seconds": 19.47575636000147
+        },
+        {
+          "association_seconds": 8.635456805994636,
+          "front_end_seconds": 19.994815277003454
+        },
+        {
+          "association_seconds": 8.596271124009036,
+          "front_end_seconds": 19.582812282000305
+        }
+      ],
+      "association_seconds": 8.635456805994636,
+      "front_end_seconds": 19.582812282000305,
+      "FPS_tracker": 104.8004778822771,
+      "FPS_tracker_front_end": 32.07142143190559
+    },
+    "deepsort_thr04": {
+      "tracker": "deepsort",
+      "det_thresh": 0.4,
+      "repeats": [
+        {
+          "association_seconds": 8.585263476995806,
+          "front_end_seconds": 19.592877383000086
+        },
+        {
+          "association_seconds": 8.574544767998304,
+          "front_end_seconds": 19.052459481007645
+        },
+        {
+          "association_seconds": 8.551100837994,
+          "front_end_seconds": 18.878233495012864
+        }
+      ],
+      "association_seconds": 8.574544767998304,
+      "front_end_seconds": 19.052459481007645,
+      "FPS_tracker": 105.54496180107634,
+      "FPS_tracker_front_end": 32.75780435124677
+    },
+    "ocsort": {
+      "tracker": "ocsort",
+      "repeats": [
+        {
+          "association_seconds": 2.1528839880088526,
+          "front_end_seconds": 0.0018346659981034463
+        },
+        {
+          "association_seconds": 2.153520108000521,
+          "front_end_seconds": 0.0018456030097695475
+        },
+        {
+          "association_seconds": 2.1502011890033828,
+          "front_end_seconds": 0.0018372849931438395
+        }
+      ],
+      "association_seconds": 2.1528839880088526,
+      "front_end_seconds": 0.0018372849931438395,
+      "FPS_tracker": 420.36635742598065,
+      "FPS_tracker_front_end": 420.007919975254
+    },
+    "ocsort_thr05": {
+      "tracker": "ocsort",
+      "det_thresh": 0.5,
+      "repeats": [
+        {
+          "association_seconds": 2.153920652996476,
+          "front_end_seconds": 0.0019015070051864313
+        },
+        {
+          "association_seconds": 2.1520195330076604,
+          "front_end_seconds": 0.0018388169969512091
+        },
+        {
+          "association_seconds": 2.1425891379981294,
+          "front_end_seconds": 0.0018098330042448652
+        }
+      ],
+      "association_seconds": 2.1520195330076604,
+      "front_end_seconds": 0.0018388169969512091,
+      "FPS_tracker": 420.5352163951658,
+      "FPS_tracker_front_end": 420.17619217998356
+    },
+    "sort": {
+      "tracker": "sort",
+      "repeats": [
+        {
+          "association_seconds": 1.7888639769953443,
+          "front_end_seconds": 0.0017293400114795077
+        },
+        {
+          "association_seconds": 1.7807988920062598,
+          "front_end_seconds": 0.0017571769944879634
+        },
+        {
+          "association_seconds": 1.7880082450033115,
+          "front_end_seconds": 0.0017696880008770677
+        }
+      ],
+      "association_seconds": 1.7880082450033115,
+      "front_end_seconds": 0.0017571769944879634,
+      "FPS_tracker": 506.1497912714177,
+      "FPS_tracker_front_end": 505.6528575626447
+    },
+    "sort_thr05": {
+      "tracker": "sort",
+      "det_thresh": 0.5,
+      "repeats": [
+        {
+          "association_seconds": 1.298697434006499,
+          "front_end_seconds": 0.0016284219973385916
+        },
+        {
+          "association_seconds": 1.2995442890005506,
+          "front_end_seconds": 0.001649065999117738
+        },
+        {
+          "association_seconds": 1.2991284409959007,
+          "front_end_seconds": 0.0016483990002598148
+        }
+      ],
+      "association_seconds": 1.2991284409959007,
+      "front_end_seconds": 0.0016483990002598148,
+      "FPS_tracker": 696.6208816937567,
+      "FPS_tracker_front_end": 695.7380944779669
+    }
+  },
+  "environment": {
+    "host": "celldata",
+    "python": "3.11.17",
+    "torch": "2.15.0+cu132",
+    "cpu": "x86_64",
+    "gpu": "NVIDIA L4"
+  }
+}

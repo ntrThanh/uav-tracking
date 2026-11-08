@@ -1,0 +1,16 @@
+det,tracker,HOTA,FPS_e2e
+yolo11m,sort_thr05,45.32,101.09
+yolo11m,deepsort_thr04,46.38,25.65
+yolo11m,bytetrack_thr06,47.09,101.01
+yolo11m,ocsort_thr05,46.51,92.29
+yolo11m,botsort_thr06,51.67,25.87
+frcnn_r50,sort_thr06,45.10,13.38
+frcnn_r50,deepsort_thr08,45.51,9.79
+frcnn_r50,bytetrack_thr08,46.64,13.33
+frcnn_r50,ocsort_thr06,46.22,13.14
+frcnn_r50,botsort_thr08,51.68,9.15
+rfdetr_m,sort_thr04,43.11,31.3
+rfdetr_m,deepsort_thr04,42.87,17.94
+rfdetr_m,bytetrack_thr06,45.97,31.49
+rfdetr_m,ocsort_thr04,43.78,30.42
+rfdetr_m,botsort_thr05,49.85,16.25

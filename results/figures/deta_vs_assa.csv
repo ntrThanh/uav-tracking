@@ -1,0 +1,16 @@
+det,tracker,DetA,AssA,HOTA
+yolo11m,sort_thr05,41.14,51.24,45.32
+yolo11m,deepsort_thr04,42.25,52.02,46.38
+yolo11m,bytetrack_thr06,41.41,54.72,47.09
+yolo11m,ocsort_thr05,41.93,52.84,46.51
+yolo11m,botsort_thr06,43.22,62.96,51.67
+frcnn_r50,sort_thr06,40.11,51.92,45.10
+frcnn_r50,deepsort_thr08,40.70,51.86,45.51
+frcnn_r50,bytetrack_thr08,41.45,53.67,46.64
+frcnn_r50,ocsort_thr06,40.83,53.45,46.22
+frcnn_r50,botsort_thr08,42.86,63.34,51.68
+rfdetr_m,sort_thr04,39.15,49.06,43.11
+rfdetr_m,deepsort_thr04,39.40,47.99,42.87
+rfdetr_m,bytetrack_thr06,40.95,52.92,45.97
+rfdetr_m,ocsort_thr04,39.84,49.73,43.78
+rfdetr_m,botsort_thr05,42.35,60.04,49.85

@@ -1,0 +1,65 @@
+{
+  "det": "rfdetr_m",
+  "split": "test-dev",
+  "params_M": 33.4,
+  "GFLOPs_mean": 78.4,
+  "GFLOPs_1920x1080": 78.4,
+  "flop_convention": "2 FLOPs per multiply-add, torch FlopCounterMode over predict()",
+  "settings": {
+    "resolution": 576,
+    "nms": null,
+    "max_det": 300,
+    "precision": "fp32"
+  },
+  "per_resolution": [
+    {
+      "width": 680,
+      "height": 382,
+      "frames": 420,
+      "image": "data/processed/mot/test-dev/uav0000306_00230_v/img1/0000001.jpg",
+      "GFLOPs": 78.4472064
+    },
+    {
+      "width": 960,
+      "height": 540,
+      "frames": 864,
+      "image": "data/processed/mot/test-dev/uav0000088_00290_v/img1/0000001.jpg",
+      "GFLOPs": 78.4472064
+    },
+    {
+      "width": 1344,
+      "height": 756,
+      "frames": 921,
+      "image": "data/processed/mot/test-dev/uav0000201_00000_v/img1/0000001.jpg",
+      "GFLOPs": 78.4472064
+    },
+    {
+      "width": 1360,
+      "height": 765,
+      "frames": 2646,
+      "image": "data/processed/mot/test-dev/uav0000009_03358_v/img1/0000001.jpg",
+      "GFLOPs": 78.4472064
+    },
+    {
+      "width": 1904,
+      "height": 1071,
+      "frames": 519,
+      "image": "data/processed/mot/test-dev/uav0000297_00000_v/img1/0000001.jpg",
+      "GFLOPs": 78.4472064
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "frames": 1000,
+      "image": "data/processed/mot/test-dev/uav0000073_00600_v/img1/0000001.jpg",
+      "GFLOPs": 78.4472064
+    },
+    {
+      "width": 2720,
+      "height": 1530,
+      "frames": 265,
+      "image": "data/processed/mot/test-dev/uav0000370_00001_v/img1/0000001.jpg",
+      "GFLOPs": 78.4472064
+    }
+  ]
+}

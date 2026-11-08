@@ -1,0 +1,4 @@
+det,split,params_M,GFLOPs_mean,GFLOPs_1920x1080
+frcnn_r50,test-dev,43.3,745.5,745.5
+rfdetr_m,test-dev,33.4,78.4,78.4
+yolo11m,test-dev,20.06,40.7,40.7
