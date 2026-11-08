@@ -25,6 +25,7 @@ weights/
 # Large experiment outputs (keep EDA figures/tables and result tables)
 results/dets/
 results/tracks/
+results/extended/
 results/trackeval/
 results/features/
 outputs/videos/

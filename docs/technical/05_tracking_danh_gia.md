@@ -51,7 +51,7 @@ Detection rơi vào vùng ignored (khóa `ignored_regions`) phải được lo�
 
 ## 5.4. Chỉ số đánh giá tracking
 
-Dùng TrackEval với `--METRICS HOTA CLEAR Identity`, chạy **từng lớp rồi lấy trung bình 5 lớp** theo cách làm của VisDrone.
+Dùng TrackEval với `--METRICS HOTA CLEAR Identity`, chạy **từng lớp rồi lấy trung bình 5 lớp** theo cách làm của VisDrone. Script là `src/evaluation/eval_track.py`. Trong mỗi frame, box GT và box tracker có hơn một nửa diện tích nằm trong vùng ignored bị loại, giống `dropObjectsInIgr` của bộ công cụ VisDrone. Trung bình 5 lớp lấy trung bình cộng các chỉ số phần trăm và lấy tổng các chỉ số đếm (IDSW, FP, FN, Frag, MT, ML).
 
 | Nhóm | Chỉ số | Ý nghĩa |
 |---|---|---|

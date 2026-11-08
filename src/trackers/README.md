@@ -33,6 +33,26 @@ python -m pytest tests
 
 Kết quả nằm ở `results/tracks/<det>/<tracker>[_tag]/<split>/<seq>.txt`, mỗi dòng là `frame,id,x,y,w,h,score,class,-1,-1`. File `run_meta.json` đi kèm ghi tham số và thời gian chạy.
 
+## Chạy toàn bộ benchmark
+
+Ba bước, mỗi bước là một script và đều chạy được riêng:
+
+| Bước | Script | Đầu ra |
+|---|---|---|
+| Cache detection (`conf=0.05`, đo ms/frame thống nhất) | `src/inference/cache_dets.py` | `results/dets/<det>/<split>/<seq>.txt`, `timing.json` |
+| Chạy tracker | `src/inference/run_tracker.py` | `results/tracks/<det>/<tracker>/<split>/` |
+| Chấm bằng TrackEval, từng lớp rồi trung bình 5 lớp, lọc vùng ignored | `src/evaluation/eval_track.py` | `results/tables/matrix_<split>_mean.csv`, `matrix_<split>_per_class.csv` |
+
+`src/scripts/run_tracking.sh` gọi lần lượt ba bước cho 3 detector, oracle và 5 tracker:
+
+```bash
+bash src/scripts/run_tracking.sh cache val test-dev
+bash src/scripts/run_tracking.sh track val
+bash src/scripts/run_tracking.sh eval val
+```
+
+Detector id: `yolo11m`, `frcnn_r50`, `rfdetr_m` (định nghĩa trong `src/detectors/`), `oracle` là GT làm detection.
+
 ## Cấu trúc
 
 | File | Trách nhiệm |
