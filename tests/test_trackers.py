@@ -141,6 +141,13 @@ def test_bytetrack_threshold_moves_new_track_threshold():
     assert cfg.new_track_thresh == pytest.approx(0.4)
 
 
+@pytest.mark.parametrize("name", ["bytetrack", "botsort"])
+def test_new_track_threshold_stays_reachable_at_high_det_threshold(name):
+    assert load_config(name, det_thresh=0.85).new_track_thresh == pytest.approx(0.95)
+    assert load_config(name, det_thresh=0.9).new_track_thresh == pytest.approx(0.95)
+    assert load_config(name, det_thresh=0.97).new_track_thresh == pytest.approx(0.97)
+
+
 def test_image_is_only_required_when_used():
     assert not make("sort").requires_image
     assert not make("bytetrack").requires_image

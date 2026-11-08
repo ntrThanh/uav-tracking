@@ -18,6 +18,7 @@ from ..registry import register
 SECOND_MATCH_THRESH = 0.5
 UNCONFIRMED_MATCH_THRESH = 0.7
 DUPLICATE_IOU_DISTANCE = 0.15
+MAX_NEW_TRACK_THRESH = 0.95     # detector scores stay below 1, so a higher bar would never start a track
 
 
 @dataclass(frozen=True)
@@ -29,9 +30,10 @@ class ByteTrackConfig(TrackerConfig):
     track_buffer: int = 30
 
     def with_det_thresh(self, value: float) -> "ByteTrackConfig":
-        """new_track_thresh keeps its distance to the high threshold."""
+        """new_track_thresh keeps its distance to the high threshold, capped at MAX_NEW_TRACK_THRESH."""
         margin = self.new_track_thresh - self.det_thresh
-        return replace(self, det_thresh=value, new_track_thresh=value + margin)
+        new_track = max(value, min(value + margin, MAX_NEW_TRACK_THRESH))
+        return replace(self, det_thresh=value, new_track_thresh=new_track)
 
 
 class State(Enum):
