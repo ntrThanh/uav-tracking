@@ -60,3 +60,33 @@ nohup.out
 
 # Office lock files
 ~$*
+
+# Red-light project: local videos, outputs, evidence and weights (vehicle and plate data are sensitive)
+redlight/data/
+redlight/outputs/
+redlight/evidence/
+redlight/weights/
+redlight/config/*.jpg
+redlight/config/*.png
+
+# Python testing
+.pytest_cache/
+
+# LaTeX auxiliary files
+*.aux
+*.fls
+*.fdb_latexmk
+*.toc
+*.out
+*.synctex.gz
+*.bbl
+*.blg
+*.tex.bak
+test_vn.*
+
+# Local/personal scratch
+server.txt
+
+# Overleaf CE clone
+report/app/overleaf/
+
