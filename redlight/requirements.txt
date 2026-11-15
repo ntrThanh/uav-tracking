@@ -1,0 +1,9 @@
+# Stage 1 (detect + track). Install torch first with the build that matches your hardware:
+#   CPU : pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+#   CUDA: https://pytorch.org/get-started/locally/
+ultralytics>=8.3
+opencv-python>=4.9
+numpy>=1.26
+lap>=0.5.12
+pytest>=8
+# Later stages (not installed yet): fastapi, uvicorn, paddleocr, paddlepaddle
