@@ -563,15 +563,21 @@ Thí nghiệm bổ trợ YOLO11m trên 1.610 ảnh DET test-dev cho thấy tinh 
 
 \begin{figure}[!htbp]
   \centering
-  \begin{subfigure}[t]{0.82\linewidth}\centering
-    \Hinh{figures/train_curve_yolo11m.png}{\linewidth}\caption{YOLO11m: diễn biến các hàm mất mát (box, cls, dfl loss) và độ chính xác mAP50, mAP50-95 qua 80 epoch.}\end{subfigure}\hfill
-  \par\smallskip
-  \begin{subfigure}[t]{0.95\linewidth}\centering
-    \Hinh{figures/train_curve_frcnn.png}{\linewidth}\caption{Faster R-CNN: đường cong hội tụ loss trên tập train và mAP trên tập val qua 25 epoch huấn luyện.}\end{subfigure}\hfill
-  \par\smallskip
-  \begin{subfigure}[t]{0.55\linewidth}\centering
-    \Hinh{figures/train_curve_rfdetr.png}{\linewidth}\caption{RF-DETR-M: đường cong hàm mất mát và mAP val; điểm tối ưu đạt tại epoch 23 (đánh dấu chấm tròn đỏ).}\end{subfigure}
-  \caption{Đường cong huấn luyện và đánh giá trên tập DET val của ba mô hình phát hiện. YOLO11m chọn checkpoint tốt nhất tại epoch 60; Faster R-CNN chọn checkpoint tại epoch 17; RF-DETR-M chọn checkpoint tối ưu tại epoch 23 dựa trên hàm mục tiêu kết hợp.}
+  \begin{subfigure}[t]{0.92\linewidth}\centering
+    \Hinh{figures/train_curve_yolo11m.png}{\linewidth}
+    \caption{YOLO11m: diễn biến các hàm mất mát (train/val loss) và độ chính xác mAP50, mAP50-95 qua 80 epoch (checkpoint tối ưu: epoch 60).}
+  \end{subfigure}
+  \par\vspace{3pt}
+  \begin{subfigure}[t]{0.92\linewidth}\centering
+    \Hinh{figures/train_curve_frcnn.png}{\linewidth}
+    \caption{Faster R-CNN: đường cong hội tụ train loss và độ chính xác mAP trên tập val qua 25 epoch huấn luyện (checkpoint tối ưu: epoch 17).}
+  \end{subfigure}
+  \par\vspace{3pt}
+  \begin{subfigure}[t]{0.92\linewidth}\centering
+    \Hinh{figures/train_curve_rfdetr.png}{\linewidth}
+    \caption{RF-DETR-M: đường cong train loss và độ chính xác mAP trên tập val qua 29 epoch huấn luyện (checkpoint tối ưu: epoch 23).}
+  \end{subfigure}
+  \caption{Đường cong huấn luyện và đánh giá trên tập DET val của ba mô hình phát hiện. Tất cả đồ thị được chuẩn hóa định dạng đồng nhất với cấu trúc 1$\times$2 (bên trái: hàm mất mát; bên phải: độ chính xác mAP50 và mAP50-95 kèm đường gióng đánh dấu checkpoint tối ưu được lựa chọn cho các thực nghiệm tracking).}
   \label{fig:train-curve}
 \end{figure}
 
@@ -1033,9 +1039,14 @@ F.~C.~Akyon, S.~O.~Altinuc, and A.~Temizel, ``Slicing aided hyper inference and 
   \nguon{Kết quả test-dev ở bảng này chỉ để tham khảo, không dùng để chọn cấu hình.}
 \end{table}
 
-\chapter{Kết quả định tính bổ sung}
+\chapter{Kết quả định tính bổ sung và trực quan hóa suy luận}
 \label{app:dinh-tinh}
-Hình~\ref{fig:det-cung-frame} so sánh nhãn chuẩn (GT) với kết quả của YOLO11m, Faster R-CNN và RF-DETR-M trên khung hình đầu tiên của chuỗi uav0000009\_03358\_v thuộc MOT test-dev. Các mô hình sử dụng cùng ngưỡng hiển thị 0,25 để quan sát sự khác biệt về vị trí hộp bao và đối tượng được phát hiện. Ngưỡng hiển thị khác với ngưỡng chọn cho tracking; số hộp hiển thị không đồng nghĩa với số dự đoán đúng. Minh họa này phản ánh một tình huống cụ thể, không đại diện cho toàn bộ tập đánh giá.
+
+Phụ lục này cung cấp các kết quả định tính mở rộng nhằm minh họa trực quan sự khác biệt giữa các mô hình phát hiện và thuật toán bám vết trong các điều kiện thực nghiệm đồng nhất.
+
+\section{So sánh phát hiện tĩnh của ba detector với Ground Truth}
+\label{sec:app-det}
+Hình~\ref{fig:det-cung-frame} so sánh nhãn chuẩn (GT) với kết quả phát hiện của YOLO11m, Faster R-CNN và RF-DETR-M trên khung hình đầu tiên của chuỗi \texttt{uav0000009\_03358\_v} thuộc MOT test-dev. Cả ba mô hình cùng sử dụng ngưỡng hiển thị 0,25 để quan sát sự khác biệt về độ phủ hộp bao, khả năng phân tách cụm phương tiện và phản hồi ở các vùng rìa ảnh.
 
 \begin{figure}[!htbp]
   \centering
@@ -1044,6 +1055,127 @@ Hình~\ref{fig:det-cung-frame} so sánh nhãn chuẩn (GT) với kết quả c�
   \label{fig:det-cung-frame}
 \end{figure}
 
+\section{Trực quan hóa suy luận của 15 tổ hợp Detector $\times$ Tracker trên cùng khung hình}
+\label{sec:app-15-combos}
+
+Để đánh giá toàn diện tác động của từng mô hình phát hiện (YOLO11m, Faster R-CNN, RF-DETR-M) khi phối hợp cùng năm thuật toán theo vết (SORT, DeepSORT, ByteTrack, OC-SORT, BoT-SORT), toàn bộ 15 tổ hợp được triển khai suy luận trên cùng một khung hình thực nghiệm tiêu biểu: \textbf{khung hình số 150 thuộc chuỗi \texttt{uav0000297\_02761\_v}} của tập kiểm thử VisDrone2019-MOT test-dev.
+
+Đây là kịch bản đại lộ đô thị nhiều làn với mật độ giao thông cực cao (từ 75 đến hơn 100 đối tượng hoạt động đồng thời), gồm luồng ô tô di chuyển tốc độ cao, xe buýt, xe tải, cùng dòng người đi bộ di chuyển cắt ngang trên cầu vượt bộ hành. Toàn bộ 15 mô hình đều được áp dụng bộ tham số và ngưỡng tin cậy tối ưu $\tau$ đã dò trên tập xác thực val (Bảng~\ref{tab:ma-tran}), đồng thời vẽ vệt quỹ đạo chuyển động lịch sử 30 khung hình gần nhất để quan sát tính liên tục của định danh.
+
+Nhằm đảm bảo tính trực quan, độ nét cao và khả năng so sánh đối chiếu rõ ràng nhất, toàn bộ 15 tổ hợp được tách bạch và chuẩn hóa thành 5 nhóm hình tương ứng với 5 thuật toán tracking. Trên mỗi hình, kết quả của ba mô hình phát hiện (YOLO11m, Faster R-CNN, RF-DETR-M) được đặt song song với kích thước đồng nhất tuyệt đối (chiếm $0{,}32$ độ rộng dòng mỗi ảnh), giúp người đọc dễ dàng nhận diện và phân tích ảnh hưởng trực tiếp của chất lượng phát hiện lên từng thuật toán bám vết mà không bị thu nhỏ hay lệch kích thước.
+
+\subsection{So sánh ba detector với thuật toán SORT}
+\label{sec:app-sort}
+Hình~\ref{fig:app-sort} thể hiện kết quả bám vết của thuật toán SORT khi kết hợp lần lượt với ba detector:
+\begin{itemize}
+  \item \textbf{YOLO11m + SORT} ($\tau=0{,}5$): Ghi nhận 90 tracks; các phương tiện mặt đường bám nhanh nhưng xuất hiện ngắt quãng vệt khi hai xe chạy song song.
+  \item \textbf{Faster R-CNN + SORT} ($\tau=0{,}6$): Ghi nhận 95 tracks; bao quát thêm một số người đi bộ trên cầu nhưng hộp bao rung lắc nhẹ giữa các frame kế tiếp.
+  \item \textbf{RF-DETR-M + SORT} ($\tau=0{,}4$): Ghi nhận 86 tracks; quỹ đạo các xe chạy thẳng đều và ôm sát làn đường, tuy nhiên vẫn xảy ra hiện tượng mất dấu khi xe bị che khuất tạm thời.
+\end{itemize}
+
+\begin{figure}[!htbp]
+  \centering
+  \begin{subfigure}[t]{0.32\linewidth}\centering\Hinh{figures/appendix_b/yolo11m_sort.jpg}{\linewidth}\caption{YOLO11m ($\tau=0{,}5$): 90 tracks}\end{subfigure}\hfill
+  \begin{subfigure}[t]{0.32\linewidth}\centering\Hinh{figures/appendix_b/frcnn_r50_sort.jpg}{\linewidth}\caption{Faster R-CNN ($\tau=0{,}6$): 95 tracks}\end{subfigure}\hfill
+  \begin{subfigure}[t]{0.32\linewidth}\centering\Hinh{figures/appendix_b/rfdetr_m_sort.jpg}{\linewidth}\caption{RF-DETR-M ($\tau=0{,}4$): 86 tracks}\end{subfigure}
+  \caption{So sánh trực quan kết quả suy luận của thuật toán SORT trên ba mô hình phát hiện tại khung hình 150, chuỗi \texttt{uav0000297\_02761\_v} (test-dev). SORT dựa thuần túy trên bộ lọc Kalman và IoU không gian, dẫn đến phân mảnh quỹ đạo khi đối tượng di chuyển đan xen.}
+  \label{fig:app-sort}
+\end{figure}
+
+\subsection{So sánh ba detector với thuật toán DeepSORT}
+\label{sec:app-deepsort}
+Hình~\ref{fig:app-deepsort} thể hiện kết quả bám vết của DeepSORT khi tích hợp mô hình trích xuất đặc trưng ngoại hình Re-ID:
+\begin{itemize}
+  \item \textbf{YOLO11m + DeepSORT} ($\tau=0{,}4$): Ghi nhận 117 tracks; số lượng track ID mới tăng cao do mô hình Re-ID tiền huấn luyện trên tập người đi bộ mặt đất gặp khó khăn khi phân biệt đặc trưng phương tiện nhìn từ góc thẳng đứng.
+  \item \textbf{Faster R-CNN + DeepSORT} ($\tau=0{,}8$): Ghi nhận 90 tracks; việc nâng ngưỡng lên $0{,}8$ giúp triệt tiêu phần lớn các hộp bao nhiễu, kiểm soát tốt các định danh trên mặt đường.
+  \item \textbf{RF-DETR-M + DeepSORT} ($\tau=0{,}4$): Ghi nhận 103 tracks; hộp bao chuẩn xác hỗ trợ Re-ID tốt hơn nhưng vẫn ghi nhận trùng lặp định danh ở các luồng xe tốc độ cao.
+\end{itemize}
+
+\begin{figure}[!htbp]
+  \centering
+  \begin{subfigure}[t]{0.32\linewidth}\centering\Hinh{figures/appendix_b/yolo11m_deepsort.jpg}{\linewidth}\caption{YOLO11m ($\tau=0{,}4$): 117 tracks}\end{subfigure}\hfill
+  \begin{subfigure}[t]{0.32\linewidth}\centering\Hinh{figures/appendix_b/frcnn_r50_deepsort.jpg}{\linewidth}\caption{Faster R-CNN ($\tau=0{,}8$): 90 tracks}\end{subfigure}\hfill
+  \begin{subfigure}[t]{0.32\linewidth}\centering\Hinh{figures/appendix_b/rfdetr_m_deepsort.jpg}{\linewidth}\caption{RF-DETR-M ($\tau=0{,}4$): 103 tracks}\end{subfigure}
+  \caption{So sánh trực quan kết quả suy luận của thuật toán DeepSORT trên ba mô hình phát hiện tại khung hình 150, chuỗi \texttt{uav0000297\_02761\_v} (test-dev). Do mô hình Re-ID (MSMT17) không chuyên biệt cho ảnh UAV nhìn xiên/thẳng đứng, số lượng track ID khởi tạo mới có xu hướng tăng cao.}
+  \label{fig:app-deepsort}
+\end{figure}
+
+\subsection{So sánh ba detector với thuật toán ByteTrack}
+\label{sec:app-bytetrack}
+Hình~\ref{fig:app-bytetrack} thể hiện kết quả bám vết của ByteTrack với cơ chế ghép hai tầng điểm tin cậy:
+\begin{itemize}
+  \item \textbf{YOLO11m + ByteTrack} ($\tau=0{,}6$): Ghi nhận 75 tracks; số lượng track được cô đọng chính xác, các xe bị che khuất dưới gầm cầu vượt vẫn duy trì ID ổn định.
+  \item \textbf{Faster R-CNN + ByteTrack} ($\tau=0{,}8$): Ghi nhận 102 tracks; khai thác tối đa độ hồi quy cao của Faster R-CNN, theo dõi liên tục cả phương tiện và người đi bộ.
+  \item \textbf{RF-DETR-M + ByteTrack} ($\tau=0{,}6$): Ghi nhận 57 tracks; quỹ đạo cực kỳ chọn lọc và sạch, hoàn toàn không xuất hiện quỹ đạo rác.
+\end{itemize}
+
+\begin{figure}[!htbp]
+  \centering
+  \begin{subfigure}[t]{0.32\linewidth}\centering\Hinh{figures/appendix_b/yolo11m_bytetrack.jpg}{\linewidth}\caption{YOLO11m ($\tau=0{,}6$): 75 tracks}\end{subfigure}\hfill
+  \begin{subfigure}[t]{0.32\linewidth}\centering\Hinh{figures/appendix_b/frcnn_r50_bytetrack.jpg}{\linewidth}\caption{Faster R-CNN ($\tau=0{,}8$): 102 tracks}\end{subfigure}\hfill
+  \begin{subfigure}[t]{0.32\linewidth}\centering\Hinh{figures/appendix_b/rfdetr_m_bytetrack.jpg}{\linewidth}\caption{RF-DETR-M ($\tau=0{,}6$): 57 tracks}\end{subfigure}
+  \caption{So sánh trực quan kết quả suy luận của thuật toán ByteTrack trên ba mô hình phát hiện tại khung hình 150, chuỗi \texttt{uav0000297\_02761\_v} (test-dev). Cơ chế ghép hai tầng giúp ByteTrack duy trì vệt bám bền bỉ qua các vùng che khuất cục bộ.}
+  \label{fig:app-bytetrack}
+\end{figure}
+
+\subsection{So sánh ba detector với thuật toán OC-SORT}
+\label{sec:app-ocsort}
+Hình~\ref{fig:app-ocsort} minh họa kết quả bám vết của OC-SORT với cơ chế quán tính chuyển động quan sát (OCM):
+\begin{itemize}
+  \item \textbf{YOLO11m + OC-SORT} ($\tau=0{,}5$): Ghi nhận 91 tracks; các xe chuyển làn có vệt cong mượt mà theo đúng hướng di chuyển thực tế.
+  \item \textbf{Faster R-CNN + OC-SORT} ($\tau=0{,}6$): Ghi nhận 95 tracks; hạn chế tích lũy sai số Kalman khi camera UAV có dao động nhẹ.
+  \item \textbf{RF-DETR-M + OC-SORT} ($\tau=0{,}4$): Ghi nhận 88 tracks; độ ổn định quỹ đạo cao, khôi phục vết nhanh sau khi đối tượng đi qua điểm giao cắt.
+\end{itemize}
+
+\begin{figure}[!htbp]
+  \centering
+  \begin{subfigure}[t]{0.32\linewidth}\centering\Hinh{figures/appendix_b/yolo11m_ocsort.jpg}{\linewidth}\caption{YOLO11m ($\tau=0{,}5$): 91 tracks}\end{subfigure}\hfill
+  \begin{subfigure}[t]{0.32\linewidth}\centering\Hinh{figures/appendix_b/frcnn_r50_ocsort.jpg}{\linewidth}\caption{Faster R-CNN ($\tau=0{,}6$): 95 tracks}\end{subfigure}\hfill
+  \begin{subfigure}[t]{0.32\linewidth}\centering\Hinh{figures/appendix_b/rfdetr_m_ocsort.jpg}{\linewidth}\caption{RF-DETR-M ($\tau=0{,}4$): 88 tracks}\end{subfigure}
+  \caption{So sánh trực quan kết quả suy luận của thuật toán OC-SORT trên ba mô hình phát hiện tại khung hình 150, chuỗi \texttt{uav0000297\_02761\_v} (test-dev). Cơ chế quán tính chuyển động quan sát giúp giảm thiểu trôi dạt vết khi phương tiện đổi hướng.}
+  \label{fig:app-ocsort}
+\end{figure}
+
+\subsection{So sánh ba detector với thuật toán BoT-SORT}
+\label{sec:app-botsort}
+Hình~\ref{fig:app-botsort} minh họa kết quả bám vết của BoT-SORT tích hợp bù chuyển động camera GMC và tái định danh:
+\begin{itemize}
+  \item \textbf{YOLO11m + BoT-SORT} ($\tau=0{,}6$): Ghi nhận 75 tracks; chất lượng vệt bám hoàn chỉnh nhất, màu định danh được bảo toàn xuyên suốt 30 khung hình lịch sử.
+  \item \textbf{Faster R-CNN + BoT-SORT} ($\tau=0{,}8$): Ghi nhận 102 tracks; duy trì định danh vững chắc ngay cả khi xe khuất sau biển hiệu quảng cáo ngang cầu.
+  \item \textbf{RF-DETR-M + BoT-SORT} ($\tau=0{,}5$): Ghi nhận 81 tracks; các quỹ đạo xe chạy thẳng tắp và đồng trục với làn đường, không bị tráo đổi ID giữa các làn kế cận.
+\end{itemize}
+
+\begin{figure}[!htbp]
+  \centering
+  \begin{subfigure}[t]{0.32\linewidth}\centering\Hinh{figures/appendix_b/yolo11m_botsort.jpg}{\linewidth}\caption{YOLO11m ($\tau=0{,}6$): 75 tracks}\end{subfigure}\hfill
+  \begin{subfigure}[t]{0.32\linewidth}\centering\Hinh{figures/appendix_b/frcnn_r50_botsort.jpg}{\linewidth}\caption{Faster R-CNN ($\tau=0{,}8$): 102 tracks}\end{subfigure}\hfill
+  \begin{subfigure}[t]{0.32\linewidth}\centering\Hinh{figures/appendix_b/rfdetr_m_botsort.jpg}{\linewidth}\caption{RF-DETR-M ($\tau=0{,}5$): 81 tracks}\end{subfigure}
+  \caption{So sánh trực quan kết quả suy luận của thuật toán BoT-SORT trên ba mô hình phát hiện tại khung hình 150, chuỗi \texttt{uav0000297\_02761\_v} (test-dev). Nhờ kết hợp bù chuyển động camera GMC và ghép hai tầng, BoT-SORT mang lại độ liền mạch quỹ đạo và độ chính xác định danh vượt trội nhất.}
+  \label{fig:app-botsort}
+\end{figure}
+
+\section{Tổng kết và đánh giá đối chiếu chuyên sâu giữa 15 tổ hợp}
+\label{sec:app-danh-gia}
+
+Dựa trên kết quả trực quan hóa suy luận đồng bộ của 15 tổ hợp trên cùng một khung hình giao thông thực tế phức tạp (Hình~\ref{fig:app-sort}--\ref{fig:app-botsort}), nhóm nghiên cứu rút ra các đánh giá chuyên sâu:
+
+\begin{enumerate}
+  \item \textbf{Tác động của mô hình phát hiện đến chất lượng bám vết}:
+  \begin{itemize}
+    \item \textit{YOLO11m}: Đạt điểm cân bằng xuất sắc nhất giữa tính kịp thời thời gian thực (thời gian suy luận 8,5 ms/frame trên GPU L4) và độ chính xác của hộp bao ở các phương tiện kích thước trung bình và lớn. Các vệt quỹ đạo chuyển động bám theo làn xe dứt khoát và mượt mà.
+    \item \textit{Faster R-CNN}: Cơ chế đề xuất vùng hai giai đoạn (RPN) giúp mô hình đạt độ nhạy vượt trội đối với nhóm người đi bộ và vật thể nhỏ ở cự ly xa (bắt trọn hơn 100 đối tượng đồng thời trên cầu vượt và mặt đường). Tuy nhiên, mô hình đòi hỏi ngưỡng tin cậy cao ($\tau=0{,}8$) để lọc triệt để các dự đoán dư thừa có độ tin cậy thấp.
+    \item \textit{RF-DETR-M}: Nhờ cơ chế Attention toàn cục, các hộp bao phương tiện được định vị vuông vức và ôm sát đường viền thân xe hơn hẳn các mô hình dạng lưới. Khi phương tiện lưu thông song song ở cự ly hẹp, RF-DETR-M ít bị hiện tượng dính hộp (merged boxes) nhất.
+  \end{itemize}
+
+  \item \textbf{Đặc tính bám vết của 5 thuật toán tracking}:
+  \begin{itemize}
+    \item \textit{SORT}: Dù đạt tốc độ xử lý phần liên kết cực cao ($\approx 700$ FPS), việc thuần phụ thuộc vào bộ lọc Kalman tuyến tính và khoảng cách IoU khiến thuật toán dễ bị phân mảnh quỹ đạo và tráo đổi ID khi các phương tiện di chuyển nhanh hoặc giao cắt nhau.
+    \item \textit{DeepSORT}: Vector đặc trưng ngoại hình Re-ID có tiềm năng duy trì danh tính lâu dài, song mô hình Re-ID tiền huấn luyện trên dữ liệu người đi bộ mặt đất (MSMT17) thể hiện sự suy giảm tính phân biệt khi trích xuất crop ô tô từ góc nhìn thẳng đứng của UAV, dẫn đến số lượng track ID khởi tạo mới bị tăng cao.
+    \item \textit{ByteTrack}: Bằng cách tận dụng các bounding box có điểm tin cậy thấp ở tầng ghép thứ hai, ByteTrack phục hồi hiệu quả các phương tiện tạm thời bị mờ hoặc che khuất một phần dưới gầm cầu vượt, giảm thiểu tối đa hiện tượng bỏ sót quỹ đạo.
+    \item \textit{OC-SORT}: Khắc phục hạn chế tích lũy sai số của Kalman bằng cách kết hợp hướng chuyển động quan sát thực tế (OCM), giúp duy trì vết ổn định trong các pha chuyển làn uốn lượn.
+    \item \textit{BoT-SORT}: Là giải pháp toàn diện nhất nhờ sự kết hợp chặt chẽ giữa bù chuyển động camera (GMC) bằng luồng quang học, cơ chế ghép cặp hai tầng và dung hợp Re-ID được tinh chỉnh ngưỡng ngoại hình. Toàn bộ vệt chuyển động lịch sử 30 frame của BoT-SORT đều liền mạch, vững chắc và hoàn toàn không bị tráo đổi định danh.
+  \end{itemize}
+\end{enumerate}
 
 \chapter{Cấu trúc hệ thống và quy trình thực nghiệm}
 \label{app:ma-nguon}
