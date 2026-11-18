@@ -32,7 +32,7 @@
   };
 
   const state = {
-    cameraId: 'cam01',
+    cameraId: new URLSearchParams(location.search).get('camera') || 'cam01',
     img: null,
     config: emptyConfig('cam01'),
     tool: 'select',
@@ -664,6 +664,19 @@
 
   // ------------------------------------------------------------- Event Listeners
   function initEvents() {
+    $('btnFromCamera').addEventListener('click', async () => {
+      const id = ($('cameraId').value || '').trim();
+      if (!id) return showToast('Nhập mã camera trước', 'error');
+      setStatus('Đang lấy ảnh từ camera...');
+      try {
+        const response = await fetch(`/api/managed-cameras/${encodeURIComponent(id)}/reference`, {method:'POST'});
+        if (!response.ok) throw new Error((await response.json()).detail || 'Không lấy được ảnh');
+        state.cameraId = id;
+        await loadReferenceImage(id);
+        updateLightCropPreview();
+        setStatus('Sẵn sàng'); showToast('Đã lấy ảnh từ camera', 'success');
+      } catch (err) { setStatus('Lỗi lấy ảnh'); showToast(err.message, 'error'); }
+    });
     $('btnSave').addEventListener('click', saveCamera);
     $('btnLoad').addEventListener('click', () => {
       const id = ($('cameraId').value || '').trim();
@@ -835,6 +848,7 @@
     initTools();
     initEvents();
     loadCameraList();
+    $('cameraId').value = state.cameraId;
     loadCamera(state.cameraId);
     setTool('select');
     fitCanvas();

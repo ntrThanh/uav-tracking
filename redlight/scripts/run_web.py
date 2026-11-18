@@ -8,6 +8,7 @@ Example:
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -25,6 +26,8 @@ def main() -> None:
     p.add_argument("--port", type=int, default=8000)
     p.add_argument("--reload", action="store_true", help="auto-reload on code changes (dev)")
     args = p.parse_args()
+    if args.host not in {"127.0.0.1", "localhost", "::1"} and not os.environ.get("REDLIGHT_ADMIN_TOKEN"):
+        p.error("Đặt REDLIGHT_ADMIN_TOKEN trước khi mở server ra ngoài localhost")
     setup_logging("INFO")
     uvicorn.run("src.api.app:app", host=args.host, port=args.port, reload=args.reload, app_dir=str(ROOT))
 

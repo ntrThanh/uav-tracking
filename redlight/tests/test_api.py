@@ -26,8 +26,9 @@ def client(tmp_path):
 
 def test_index_and_static_served(client):
     r = client.get("/")
-    assert r.status_code == 200 and "<canvas" in r.text
-    assert client.get("/static/app.js").status_code == 200
+    assert r.status_code == 200 and "Trung tâm giám sát" in r.text
+    assert client.get("/editor").status_code == 200
+    assert client.get("/static/dashboard.js").status_code == 200
 
 
 def test_missing_camera_is_404_and_list_empty(client):

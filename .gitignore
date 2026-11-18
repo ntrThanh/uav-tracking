@@ -68,6 +68,7 @@ redlight/evidence/
 redlight/weights/
 redlight/config/*.jpg
 redlight/config/*.png
+redlight/config/cameras/
 
 # Python testing
 .pytest_cache/
