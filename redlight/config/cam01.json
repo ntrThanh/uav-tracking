@@ -1,8 +1,0 @@
-{
-  "camera_id": "cam01",
-  "reference_frame": "cam01_ref.jpg",
-  "stop_line": null,
-  "zones": [],
-  "light_roi": null,
-  "light_override": null
-}
