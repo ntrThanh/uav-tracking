@@ -42,6 +42,7 @@ dist/
 
 # Environments
 .venv/
+.venv-tracking/
 venv/
 env/
 .env
@@ -61,14 +62,9 @@ nohup.out
 # Office lock files
 ~$*
 
-# Red-light project: local videos, outputs, evidence and weights (vehicle and plate data are sensitive)
-redlight/data/
-redlight/outputs/
-redlight/evidence/
-redlight/weights/
-redlight/config/*.jpg
-redlight/config/*.png
-redlight/config/cameras/
+# Local tracking results and model artifacts
+outputs/tracking_app/
+!tracking_app/models/ocr/**/inference.onnx
 
 # Python testing
 .pytest_cache/

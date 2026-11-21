@@ -1,5 +1,7 @@
 # UAV Tracking
 
+Reusable research inference pipelines and configuration examples: [src/engine/README.md](src/engine/README.md). The desktop tracking app uses its own runtime in [tracking_app/engine/README.md](tracking_app/engine/README.md).
+
 Benchmarking 3 detectors (YOLO11, Faster R-CNN, RF-DETR) × 5 trackers (SORT, DeepSORT, ByteTrack, OC-SORT, BoT-SORT) for multi-object tracking on VisDrone2019-MOT.
 
 Đồ án cuối kỳ môn Thị giác máy tính nâng cao. Dự án so sánh ba họ detector (transformer, một giai đoạn, hai giai đoạn) kết hợp với năm thuật toán tracking trên video quay từ drone, nơi đối tượng rất nhỏ, dày đặc và camera liên tục chuyển động. Tài liệu kỹ thuật đầy đủ nằm trong [docs/](docs/README.md).
