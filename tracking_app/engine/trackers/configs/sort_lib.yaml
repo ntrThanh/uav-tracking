@@ -1,0 +1,5 @@
+# Library version of sort. Same parameters as sort.yaml.
+det_thresh: 0.4
+max_age: 30
+min_hits: 3
+iou_threshold: 0.3

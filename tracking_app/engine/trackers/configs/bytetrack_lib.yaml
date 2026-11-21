@@ -1,0 +1,5 @@
+# Library version of ByteTrack (boxmot). det_thresh is used for matching and for new tracks.
+det_thresh: 0.5
+track_low_thresh: 0.1
+match_thresh: 0.8
+track_buffer: 30
