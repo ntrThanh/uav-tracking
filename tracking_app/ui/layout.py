@@ -22,6 +22,7 @@ MUTED = "#6C7D76"
 LINE = "#E3EAE6"
 ACCENT = "#167C61"
 SIDEBAR = "#15241F"
+FONT_FAMILY = "sans-serif"
 
 DETECTION_FIELDS = (
     ("vehicle_backend", "Vehicle detector backend"),
@@ -77,30 +78,34 @@ GROUP_LABELS = {group: title for group, title, _, _ in SETTINGS_GROUPS}
 
 
 def apply_style(root: tk.Tk) -> None:
+    global FONT_FAMILY
+    available = set(tkfont.families(root))
+    FONT_FAMILY = next((family for family in ("Noto Sans", "DejaVu Sans")
+                        if family in available), tkfont.nametofont("TkDefaultFont").actual("family"))
     for name in ("TkDefaultFont", "TkTextFont", "TkMenuFont", "TkHeadingFont"):
-        tkfont.nametofont(name).configure(family="Helvetica", size=10)
+        tkfont.nametofont(name).configure(family=FONT_FAMILY, size=11)
     style = ttk.Style(root)
     style.theme_use("clam")
     style.configure("TFrame", background=WHITE)
     style.configure("Card.TFrame", background=WHITE)
-    style.configure("TLabel", background=WHITE, foreground=INK, font=("Helvetica", 10))
-    style.configure("Muted.TLabel", background=WHITE, foreground=MUTED, font=("Helvetica", 9))
-    style.configure("Section.TLabel", background=WHITE, foreground=INK, font=("Helvetica", 12, "bold"))
+    style.configure("TLabel", background=WHITE, foreground=INK, font=(FONT_FAMILY, 11))
+    style.configure("Muted.TLabel", background=WHITE, foreground=MUTED, font=(FONT_FAMILY, 10))
+    style.configure("Section.TLabel", background=WHITE, foreground=INK, font=(FONT_FAMILY, 12, "bold"))
     style.configure("TEntry", padding=(10, 9), bordercolor=LINE, lightcolor=LINE, darkcolor=LINE)
     style.configure("TCombobox", padding=(9, 8), fieldbackground=WHITE, background=WHITE,
                     bordercolor=LINE, lightcolor=LINE, darkcolor=LINE)
     style.map("TCombobox", fieldbackground=[("readonly", WHITE)])
     style.configure("TButton", padding=(14, 10), background=WHITE, foreground=INK,
-                    bordercolor=LINE, lightcolor=LINE, darkcolor=LINE, font=("Helvetica", 10))
+                    bordercolor=LINE, lightcolor=LINE, darkcolor=LINE, font=(FONT_FAMILY, 11))
     style.map("TButton", background=[("active", "#F1F5F2")])
     style.configure("Primary.TButton", background=ACCENT, foreground=WHITE,
                     bordercolor=ACCENT, lightcolor=ACCENT, darkcolor=ACCENT)
     style.map("Primary.TButton", background=[("active", "#10654F"), ("disabled", "#B5CEC4")],
               foreground=[("disabled", WHITE)])
     style.configure("Treeview", background=WHITE, fieldbackground=WHITE, foreground=INK,
-                    rowheight=36, borderwidth=0, font=("Helvetica", 9))
+                    rowheight=36, borderwidth=0, font=(FONT_FAMILY, 10))
     style.configure("Treeview.Heading", background="#F1F5F2", foreground=MUTED,
-                    borderwidth=0, padding=(8, 12), font=("Helvetica", 9, "bold"))
+                    borderwidth=0, padding=(8, 12), font=(FONT_FAMILY, 10, "bold"))
     style.map("Treeview", background=[("selected", "#DDF0E7")], foreground=[("selected", INK)])
 
 
@@ -110,7 +115,9 @@ def _card(parent, padding=22) -> ttk.Frame:
 
 
 def _text(parent, value, *, size=10, weight="normal", color=INK, bg=WHITE) -> tk.Label:
-    return tk.Label(parent, text=value, bg=bg, fg=color, font=("Helvetica", size, weight), anchor="w")
+    display_size = size + 1 if size <= 10 else size
+    return tk.Label(parent, text=value, bg=bg, fg=color,
+                    font=(FONT_FAMILY, display_size, weight), anchor="w")
 
 
 def build(app) -> None:
@@ -136,12 +143,12 @@ def build(app) -> None:
                        ("settings", "Model settings")):
         button = tk.Button(nav, text=label, anchor="w", padx=16, pady=14, bd=0,
                            bg=SIDEBAR, fg="#B5C8BD", activebackground="#244136",
-                           activeforeground=WHITE, font=("Helvetica", 10, "bold"),
+                           activeforeground=WHITE, font=(FONT_FAMILY, 11, "bold"),
                            relief="flat", cursor="hand2", command=lambda page=key: show_page(app, page))
         button.pack(fill="x", pady=3)
         app._nav_buttons[key] = button
     tk.Label(sidebar, text="LOCAL AI  /  ONNX", bg=SIDEBAR, fg="#8AA498",
-             font=("Helvetica", 9)).pack(side="bottom", anchor="w", padx=26, pady=25)
+             font=(FONT_FAMILY, 10)).pack(side="bottom", anchor="w", padx=26, pady=25)
 
     content = tk.Frame(shell, bg=BG)
     content.grid(row=0, column=1, sticky="nsew", padx=28, pady=24)
@@ -153,7 +160,7 @@ def build(app) -> None:
     app._page_title = _text(header, "Live monitor", size=23, weight="bold", bg=BG)
     app._page_title.grid(row=0, column=0, sticky="w")
     app.status_label = tk.Label(header, textvariable=app.status, bg="#E1F1E8", fg="#126B52",
-                                padx=14, pady=8, font=("Helvetica", 10, "bold"))
+                                padx=14, pady=8, font=(FONT_FAMILY, 11, "bold"))
     app.status_label.grid(row=0, column=1, sticky="e")
 
     stack = tk.Frame(content, bg=BG)
@@ -169,7 +176,7 @@ def build(app) -> None:
     _history_page(app, app._pages["history"])
     _settings_page(app, app._pages["settings"])
     tk.Label(content, textvariable=app.message, bg=BG, fg=MUTED,
-             font=("Helvetica", 9), anchor="w").grid(row=2, column=0, sticky="ew", pady=(14, 0))
+             font=(FONT_FAMILY, 10), anchor="w").grid(row=2, column=0, sticky="ew", pady=(14, 0))
     show_page(app, "live")
 
 
@@ -203,7 +210,7 @@ def _live_page(app, page) -> None:
     app.details_button = ttk.Button(top, text="Show details", command=app._toggle_inference_details)
     app.details_button.pack(side="right", padx=(12, 0))
     tk.Label(top, textvariable=app.counts, bg=WHITE, fg=MUTED,
-             font=("Helvetica", 10)).pack(side="right")
+             font=(FONT_FAMILY, 11)).pack(side="right")
     metrics = tk.Frame(preview, bg=WHITE)
     metrics.grid(row=1, column=0, sticky="ew", pady=(0, 14))
     for column, (title, value) in enumerate((("Processing speed", app.fps_value),
@@ -215,9 +222,9 @@ def _live_page(app, page) -> None:
         tile.grid(row=0, column=column, sticky="ew", padx=(0, 10) if column < 2 else 0)
         _text(tile, title, size=9, color=MUTED, bg="#F7FAF8").pack(anchor="w")
         tk.Label(tile, textvariable=value, bg="#F7FAF8", fg=INK,
-                 font=("Helvetica", 14, "bold"), anchor="w").pack(anchor="w", pady=(3, 0))
+                 font=(FONT_FAMILY, 14, "bold"), anchor="w").pack(anchor="w", pady=(3, 0))
     app.preview_label = tk.Label(preview, text="Select a source, then start AI", bg="#101C18",
-                                 fg="#90A59A", font=("Helvetica", 11))
+                                 fg="#90A59A", font=(FONT_FAMILY, 11))
     app.preview_label.grid(row=2, column=0, sticky="nsew")
     details = tk.Frame(app.preview_label, bg=WHITE, padx=10, pady=6,
                        highlightbackground=LINE, highlightthickness=1)
@@ -232,9 +239,9 @@ def _live_page(app, page) -> None:
         _text(details, title, size=9).grid(row=row, column=0, sticky="w", pady=1)
         for column, field in enumerate(("last", "average", "calls"), start=1):
             tk.Label(details, textvariable=app.stage_values[name][field], bg=WHITE, fg=INK,
-                     font=("Helvetica", 9), anchor="w").grid(row=row, column=column, sticky="w", pady=1)
+                     font=(FONT_FAMILY, 10), anchor="w").grid(row=row, column=column, sticky="w", pady=1)
     tk.Label(preview, text="Orange lines show vehicle trajectories in the frame.",
-             bg=WHITE, fg=MUTED, font=("Helvetica", 9)).grid(row=3, column=0, sticky="w", pady=(12, 0))
+             bg=WHITE, fg=MUTED, font=(FONT_FAMILY, 10)).grid(row=3, column=0, sticky="w", pady=(12, 0))
 
     controls = _card(page, 20)
     controls.grid(row=1, column=0, sticky="ew", pady=(16, 0))
@@ -296,12 +303,12 @@ def _history_page(app, page) -> None:
     app.path_canvas.bind("<Configure>", lambda _e: app._draw_trajectory())
     app.trajectory_info = tk.StringVar(value="")
     tk.Label(details, textvariable=app.trajectory_info, bg=WHITE, fg=MUTED,
-             font=("Helvetica", 9), anchor="w").grid(row=2, column=0, sticky="ew", pady=(7, 0))
+             font=(FONT_FAMILY, 10), anchor="w").grid(row=2, column=0, sticky="ew", pady=(7, 0))
     for column, kind, empty in ((1, "vehicle", "Select a vehicle"), (2, "plate", "No plate image")):
         holder = tk.Frame(details, height=220, bg="#F7FAF8", highlightbackground=LINE, highlightthickness=1)
         holder.grid(row=1, column=column, sticky="nsew", padx=(0, 12) if column == 1 else 0)
         holder.grid_propagate(False)
-        label = tk.Label(holder, text=empty, bg="#F7FAF8", fg=MUTED, font=("Helvetica", 10))
+        label = tk.Label(holder, text=empty, bg="#F7FAF8", fg=MUTED, font=(FONT_FAMILY, 11))
         label.pack(fill="both", expand=True)
         label.bind("<Configure>", lambda _event, image_kind=kind: app._render_evidence(image_kind))
         if kind == "plate":
@@ -311,7 +318,7 @@ def _history_page(app, page) -> None:
         info = tk.StringVar(value="")
         setattr(app, f"{kind}_evidence_info", info)
         tk.Label(details, textvariable=info, bg=WHITE, fg=MUTED,
-                 font=("Helvetica", 9), anchor="w").grid(row=2, column=column, sticky="ew", pady=(7, 0))
+                 font=(FONT_FAMILY, 10), anchor="w").grid(row=2, column=column, sticky="ew", pady=(7, 0))
 
 
 def _settings_page(app, page) -> None:
