@@ -77,7 +77,7 @@ class SessionStore:
                        (session_id, track_id, plate, confidence, frame_id))
 
     def set_plate(self, session_id: str, track_id: int, plate: str, confidence: float, frame_id: int) -> None:
-        """Replace a plate when the user explicitly retries OCR on saved evidence."""
+        """Replace a plate chosen by live consensus or an explicit OCR retry."""
         with self._db() as db:
             db.execute("""INSERT INTO plates VALUES(?,?,?,?,?) ON CONFLICT(session_id,track_id) DO UPDATE SET
                 plate=excluded.plate, confidence=excluded.confidence, first_frame=excluded.first_frame""",

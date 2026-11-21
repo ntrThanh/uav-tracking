@@ -17,6 +17,7 @@ from tracking_app.engine.sources import FrameSource
 
 from .config import Settings
 from .evidence import draw_trajectory
+from .ocr.consensus import PlateConsensus
 from .pipeline import InferencePipeline, create_pipeline
 from .storage import SessionStore
 
@@ -105,9 +106,10 @@ class SessionRunner:
             pipeline = self.pipeline_factory(settings)
             trajectories: dict[int, deque[tuple[int, int]]] = defaultdict(lambda: deque(maxlen=200))
             known_plates: dict[int, tuple[str, float]] = {}
+            plate_consensus: dict[int, PlateConsensus] = defaultdict(PlateConsensus)
             best_vehicle_scores: dict[int, float] = {}
+            best_plate_scores: dict[int, float] = {}
             best_unread_plate_scores: dict[int, float] = {}
-            plate_image_ids: set[int] = set()
             last_seen: dict[int, tuple] = {}
             source = FrameSource(uri, session_id, kind, stride=settings.stride, reconnect=kind == "rtsp")
             with self.lock:
@@ -145,25 +147,34 @@ class SessionRunner:
                                                              frame.meta.frame_id, frame.meta.timestamp, track.confidence)
                                     best_vehicle_scores[track.track_id] = quality
                         for read in reads:
-                            previous_confidence = known_plates.get(read.track_id, ("", 0))[1]
-                            improved_read = bool(read.text) and read.confidence > previous_confidence
-                            if improved_read:
-                                known_plates[read.track_id] = (read.text, read.confidence)
-                                self.store.add_plate(session_id, read.track_id, read.text,
-                                                     read.confidence, frame.meta.frame_id)
+                            consensus = plate_consensus[read.track_id]
+                            previous = consensus.selection
+                            selected = consensus.observe(read.text, read.confidence, frame.meta.frame_id)
+                            selection_changed = selected is not None and selected != previous
+                            if selection_changed:
+                                known_plates[read.track_id] = (selected.text, selected.confidence)
+                                self.store.set_plate(session_id, read.track_id, selected.text,
+                                                     selected.confidence, selected.frame_id)
+                                if previous is not None and previous.text != selected.text:
+                                    best_plate_scores.pop(read.track_id, None)
                             plate_crop = self._crop(frame.image, read.bbox) if read.bbox else None
                             if plate_crop is not None:
                                 unread_quality = read.detection_confidence * plate_crop.shape[0] * plate_crop.shape[1]
-                                save_plate = (improved_read or (read.text and read.track_id not in plate_image_ids)
-                                              or (not read.text and read.track_id not in known_plates and
-                                                  (read.track_id not in best_unread_plate_scores or
-                                                   unread_quality > best_unread_plate_scores[read.track_id] * 1.2)))
+                                accepted_read = bool(read.text and selected and read.text == selected.text)
+                                plate_quality = read.confidence * plate_crop.shape[0] * plate_crop.shape[1]
+                                save_plate = ((accepted_read and
+                                               (selection_changed or read.track_id not in best_plate_scores or
+                                                plate_quality > best_plate_scores[read.track_id] * 1.2)) or
+                                              (not read.text and selected is None and
+                                               (read.track_id not in best_unread_plate_scores or
+                                                unread_quality > best_unread_plate_scores[read.track_id] * 1.2)))
                                 if save_plate:
                                     self.store.save_evidence(session_id, read.track_id, "plate", plate_crop,
                                                              frame.meta.frame_id, frame.meta.timestamp,
                                                              read.confidence if read.text else read.detection_confidence)
-                                    plate_image_ids.add(read.track_id)
-                                    if not read.text:
+                                    if accepted_read:
+                                        best_plate_scores[read.track_id] = plate_quality
+                                    else:
                                         best_unread_plate_scores[read.track_id] = unread_quality
                         preview = self._render(frame.image, tracks, trajectories, known_plates, settings.preview_width)
                         with self.lock:
