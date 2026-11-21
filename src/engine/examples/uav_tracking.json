@@ -1,0 +1,8 @@
+{
+  "models": "models.json",
+  "nodes": [
+    {"id":"objects","type":"detector","config":{"model":"visdrone_yolo11m","device":"auto","fallback":["cpu"]}},
+    {"id":"tracks","type":"tracker","inputs":["objects"],"config":{"algorithm":"bytetrack","det_thresh":0.5}},
+    {"id":"tracking_output","type":"track_sink","inputs":["tracks"],"config":{"path":"../../../outputs/engine/uav_{source_id}.jsonl"}}
+  ]
+}

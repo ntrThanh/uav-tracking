@@ -1,0 +1,52 @@
+{
+  "models": [
+    {
+      "model_id": "visdrone_yolo11m",
+      "task": "object_detection",
+      "architecture": "yolo11m",
+      "weights": "../../../weights/turning/T1_yolo11m_640_det/best_yolo11m.pt",
+      "runtime": "pytorch",
+      "input_size": [640, 640],
+      "precision": "fp32",
+      "classes": {"1":"pedestrian","2":"people","3":"bicycle","4":"car","5":"van","6":"truck","7":"tricycle","8":"awning-tricycle","9":"bus","10":"motor"},
+      "version": "det-seed0",
+      "postprocess": {"conf": 0.05}
+    },
+    {
+      "model_id": "visdrone_rfdetr_m",
+      "task": "object_detection",
+      "architecture": "rfdetr_m",
+      "weights": "../../../weights/turning/T3det_rfdetr_m_576_det/checkpoint_best_total.pth",
+      "runtime": "pytorch",
+      "input_size": [576, 576],
+      "precision": "fp32",
+      "classes": {"1":"pedestrian","2":"people","3":"bicycle","4":"car","5":"van","6":"truck","7":"tricycle","8":"awning-tricycle","9":"bus","10":"motor"},
+      "version": "det-seed0",
+      "postprocess": {"conf": 0.05}
+    },
+    {
+      "model_id": "visdrone_frcnn_r50",
+      "task": "object_detection",
+      "architecture": "frcnn_r50",
+      "weights": "../../../weights/turning/T2_frcnn_r50_v2_det_seed0/best_frcnn.pt",
+      "runtime": "pytorch",
+      "input_size": [800, 1333],
+      "precision": "fp32",
+      "classes": {"1":"pedestrian","2":"people","3":"bicycle","4":"car","5":"van","6":"truck","7":"tricycle","8":"awning-tricycle","9":"bus","10":"motor"},
+      "version": "det-seed0",
+      "postprocess": {"conf": 0.05}
+    },
+    {
+      "model_id": "traffic_plate_yolo11s",
+      "task": "license_plate_detection",
+      "architecture": "ultralytics_yolo",
+      "weights": "../../../tracking_app/models/plate/plate_yolo11s.pt",
+      "runtime": "pytorch",
+      "input_size": [640, 640],
+      "precision": "fp32",
+      "classes": {"0":"plate"},
+      "version": "plate-seed0",
+      "postprocess": {"conf": 0.25, "iou": 0.7}
+    }
+  ]
+}

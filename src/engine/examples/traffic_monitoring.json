@@ -1,0 +1,17 @@
+{
+  "models": "models.json",
+  "nodes": [
+    {"id":"vehicles","type":"detector","config":{"model":"visdrone_yolo11m","device":"auto","fallback":["cpu"]}},
+    {"id":"tracks","type":"tracker","inputs":["vehicles"],"config":{"algorithm":"bytetrack","det_thresh":0.5}},
+    {"id":"plates","type":"detector","inputs":["tracks"],"when":"has_tracks","config":{"model":"traffic_plate_yolo11s","device":"cpu","fallback":[],"track_rois":true}},
+    {"id":"light","type":"traffic_light","config":{"roi":[0.45,0.05,0.04,0.08],"history_len":5}},
+    {"id":"rules","type":"rule","inputs":["tracks","light"],"config":{"rules":[
+      {"type":"line_crossing","rule_id":"stop_line","a":[0.2,0.7],"b":[0.8,0.7],"direction":"down"},
+      {"type":"red_light","rule_id":"red_violation","a":[0.2,0.7],"b":[0.8,0.7],"direction":"down","event_type":"red_light_candidate"}
+    ]}},
+    {"id":"events","type":"sink","inputs":["rules"],"when":"has_events","config":{"sinks":[
+      {"type":"jsonl","path":"../../../outputs/engine/traffic_{source_id}.jsonl"},
+      {"type":"evidence","path":"../../../outputs/engine/evidence/{source_id}"}
+    ]}}
+  ]
+}
