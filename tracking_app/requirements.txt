@@ -1,0 +1,6 @@
+# ONNX Runtime is the inference backend for vehicle, plate and PaddleOCR.
+onnxruntime>=1.18
+opencv-python>=4.9
+pillow>=10
+pyyaml>=6
+scipy>=1.11

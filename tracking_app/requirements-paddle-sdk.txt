@@ -1,0 +1,2 @@
+# Optional official PaddleOCR SDK adapter; the default local ONNX adapter does not need it.
+paddleocr>=3.5

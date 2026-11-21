@@ -1,0 +1,3 @@
+# Needed only when regenerating the two YOLO ONNX files from .pt checkpoints.
+ultralytics>=8.3
+onnx>=1.16
