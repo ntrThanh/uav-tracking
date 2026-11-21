@@ -1,6 +1,7 @@
 """SQLite persistence and Excel export for sessions, tracks and plate reads."""
 from __future__ import annotations
 
+import json
 import sqlite3
 from shutil import copy2
 from pathlib import Path
@@ -116,6 +117,11 @@ class SessionStore:
         with self._db() as db:
             rows = db.execute("SELECT * FROM sessions ORDER BY started_at DESC LIMIT 100").fetchall()
         return [dict(row) for row in rows]
+
+    def session_settings(self, session_id: str) -> dict | None:
+        with self._db() as db:
+            row = db.execute("SELECT settings_json FROM sessions WHERE id=?", (session_id,)).fetchone()
+        return json.loads(row["settings_json"]) if row else None
 
     def tracks(self, session_id: str, plate_filter: str = "") -> list[dict]:
         query = """SELECT p.track_id, MIN(p.video_time) AS first_time, MAX(p.video_time) AS last_time,

@@ -304,6 +304,9 @@ def _history_page(app, page) -> None:
         label = tk.Label(holder, text=empty, bg="#F7FAF8", fg=MUTED, font=("Helvetica", 10))
         label.pack(fill="both", expand=True)
         label.bind("<Configure>", lambda _event, image_kind=kind: app._render_evidence(image_kind))
+        if kind == "plate":
+            label.configure(cursor="hand2")
+            label.bind("<Button-1>", lambda _event: app._show_plate_preprocessing())
         setattr(app, f"{kind}_evidence_label", label)
         info = tk.StringVar(value="")
         setattr(app, f"{kind}_evidence_info", info)

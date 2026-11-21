@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import io
 import tkinter as tk
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 
@@ -262,6 +262,40 @@ class DesktopApp:
         photo = ImageTk.PhotoImage(image)
         self._evidence_photos[kind] = photo
         label.configure(image=photo, text="")
+
+    def _show_plate_preprocessing(self) -> None:
+        selected = self.table.selection()
+        session_id = self._current_session()
+        if not selected or not session_id:
+            self.message.set("Select a track with a plate image first.")
+            return
+        track_id = int(selected[0])
+        evidence = self.store.evidence(session_id, track_id).get("plate")
+        if not evidence or not evidence["path"].is_file():
+            self.message.set("No plate image is available for this track.")
+            return
+        try:
+            import cv2
+            import numpy as np
+            from tracking_app.ocr.preprocess import (PreprocessStage, StandardPlatePreprocessor,
+                                                     create_preprocessor)
+            from .plate_preprocessing import show_plate_preprocessing
+
+            saved = self.store.session_settings(session_id) or {}
+            ocr_fields = ("ocr_upscale", "ocr_preprocess_mode", "ocr_clahe_clip", "ocr_sharpen")
+            settings = replace(Settings(), **{key: saved[key] for key in ocr_fields if key in saved})
+            with Image.open(evidence["path"]) as source:
+                crop = cv2.cvtColor(np.asarray(source.convert("RGB")), cv2.COLOR_RGB2BGR)
+            processor = create_preprocessor(settings)
+            if isinstance(processor, StandardPlatePreprocessor):
+                stages = list(processor.stages(crop))
+            else:
+                stages = [PreprocessStage("Original crop", crop)]
+                stages.extend(PreprocessStage(f"OCR input {index}", image, index)
+                              for index, image in enumerate(processor.variants(crop), 1))
+            show_plate_preprocessing(self.root, stages, track_id, evidence)
+        except Exception as exc:
+            messagebox.showerror("Could not show preprocessing", str(exc), parent=self.root)
 
     def _draw_trajectory(self) -> None:
         canvas = self.path_canvas
