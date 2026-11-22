@@ -147,7 +147,7 @@ def build(app) -> None:
                            relief="flat", cursor="hand2", command=lambda page=key: show_page(app, page))
         button.pack(fill="x", pady=3)
         app._nav_buttons[key] = button
-    tk.Label(sidebar, text="LOCAL AI  /  ONNX", bg=SIDEBAR, fg="#8AA498",
+    tk.Label(sidebar, text="", bg=SIDEBAR, fg="#8AA498",
              font=(FONT_FAMILY, 10)).pack(side="bottom", anchor="w", padx=26, pady=25)
 
     content = tk.Frame(shell, bg=BG)

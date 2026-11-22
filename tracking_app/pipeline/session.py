@@ -53,7 +53,7 @@ class InferencePipeline:
                 x1, y1 = max(0, x1), max(0, y1)
                 x2, y2 = min(frame.meta.original_width, x2), min(frame.meta.original_height, y2)
                 if x2 <= x1 or y2 <= y1:
-                    continue
+                    continue 
                 started = perf_counter()
                 result = self.reader.read(frame.image[y1:y2, x1:x2])
                 timings.append(("ocr", (perf_counter() - started) * 1000))
