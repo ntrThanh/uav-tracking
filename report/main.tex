@@ -130,7 +130,7 @@
 \newcommand{\HocPhan}{Thị giác máy tính nâng cao}
 \newcommand{\LoaiBaoCao}{BÁO CÁO ĐỒ ÁN MÔN HỌC}
 \newcommand{\TenDeTai}{ỨNG DỤNG THEO VẾT ĐA ĐỐI TƯỢNG TRONG BÀI TOÁN QUẢN LÝ GIAO THÔNG}
-\newcommand{\Lop}{\CanDien{K68A4}}
+\newcommand{\Lop}{K68A4}
 \newcommand{\GiangVien}{TS. Cao Văn Chung}
 \newcommand{\DiaDiem}{Hà Nội}
 \newcommand{\ThoiGian}{tháng 11 năm 2026}
@@ -164,9 +164,9 @@
   \vspace{0.2cm}
   \renewcommand{\arraystretch}{1.3}
   \begin{tabular}{@{}ll@{}}
-    Nguyễn Trọng Thành (nhóm trưởng) & \CanDien{23001934}\\
-    Đinh Bá Thi & \CanDien{23001942}\\
-    Đinh Quang Tiến & \CanDien{23001943}\\
+    Nguyễn Trọng Thành (nhóm trưởng) & 23001934\\
+    Đinh Bá Thi & 23001942\\
+    Đinh Quang Tiến & 23001943\\
   \end{tabular}\par
   \vspace{0.35cm}
   \textbf{Lớp:} \Lop\par
@@ -509,7 +509,7 @@ Hộp có hơn 50\% diện tích nằm trong hợp các vùng ignored bị loạ
 \subsection{Kết quả phát hiện}
 \label{sec:ket-qua-det}
 
-Bảng~\ref{tab:det} cho thấy mAP50-95 trên MOT test-dev nằm trong khoảng 22,45--23,17, chênh nhiều nhất 0,72 điểm. Faster R-CNN dẫn đầu trên val (24,15), còn YOLO11m dẫn đầu trên test-dev (23,17). Các kết quả gần nhau về giá trị tổng hợp, nhưng chưa có kiểm định để khẳng định tương đương thống kê. AP nhỏ chỉ đạt 8,02--8,35, thấp rõ rệt so với AP lớn 39,72--47,65. Bảng~\ref{tab:det-lop} còn cho thấy thế mạnh theo lớp khác nhau: YOLO11m đạt AP bus 44,82, Faster R-CNN đạt AP van 31,48, còn RF-DETR-M đạt AP truck 42,52. Vì vậy không có detector dẫn đầu mọi lớp.
+Bảng~\ref{tab:det} cho thấy mAP50-95 trên MOT test-dev nằm trong khoảng 22,45--23,17, chênh nhiều nhất 0,72 điểm. Faster R-CNN dẫn đầu trên val (24,15), còn YOLO11m dẫn đầu trên test-dev (23,17). Các kết quả gần nhau về giá trị tổng hợp, nhưng chưa có kiểm định để khẳng định tương đương thống kê. AP nhỏ chỉ đạt 8,02--8,35, thấp rõ rệt so với AP lớn 39,72--47,65. Bảng~\ref{tab:det-lop} còn cho thấy thế mạnh theo lớp khác nhau: YOLO11m đạt AP bus 44,82, Faster R-CNN đạt AP van 31,48, còn RF-DETR-M đạt AP truck 42,52. Vì vậy không có detector dẫn đầu mọi lớp. Diễn biến hội tụ hàm mất mát và độ chính xác mAP trên tập DET val của cả ba mô hình được trình bày trong Hình~\ref{fig:train-curve}.
 
 Thí nghiệm bổ trợ YOLO11m trên 1.610 ảnh DET test-dev cho thấy tinh chỉnh có ích: mAP tăng từ 8,61 lên 26,05. Phép thử này gộp nhãn thành sáu lớp chung với COCO, dùng ngưỡng suy luận 0,001 và tối đa 1.000 detection khi đánh giá. Do khác tập ảnh, số lớp và giao thức, hai số này được nêu riêng, không đưa vào bảng so sánh mười lớp trên MOT test-dev.
 
@@ -599,7 +599,7 @@ Khảo sát mở rộng thử thêm 0,85 và 0,9 trên val: Faster R-CNN + BoT-S
 \subsection{Ma trận kết quả trên test-dev}
 \label{sec:ma-tran}
 
-Trong ma trận dùng ngưỡng chọn trên val (Bảng~\ref{tab:ma-tran}), BoT-SORT dẫn đầu HOTA với cả ba detector. Faster R-CNN + BoT-SORT đạt 51,68, gần bằng YOLO11m + BoT-SORT (51,67); chênh lệch 0,01 không đủ cơ sở để khẳng định ưu thế bền vững. RF-DETR-M + BoT-SORT đạt 49,85, thấp hơn 1,82 điểm so với YOLO11m. So với ByteTrack trong cùng detector, BoT-SORT tăng 3,88--5,04 điểm HOTA; AssA tăng 7,12--9,67 điểm, còn DetA tăng 1,40--1,81 điểm. Phần chênh nổi bật nằm ở liên kết định danh.
+Trong ma trận dùng ngưỡng chọn trên val (Bảng~\ref{tab:ma-tran} và trực quan hóa trên bản đồ nhiệt ở Hình~\ref{fig:heatmap}), BoT-SORT dẫn đầu HOTA với cả ba detector. Faster R-CNN + BoT-SORT đạt 51,68, gần bằng YOLO11m + BoT-SORT (51,67); chênh lệch 0,01 không đủ cơ sở để khẳng định ưu thế bền vững. RF-DETR-M + BoT-SORT đạt 49,85, thấp hơn 1,82 điểm so với YOLO11m. So với ByteTrack trong cùng detector, BoT-SORT tăng 3,88--5,04 điểm HOTA; AssA tăng 7,12--9,67 điểm, còn DetA tăng 1,40--1,81 điểm. Phần chênh nổi bật nằm ở liên kết định danh.
 
 Xu hướng IDF1 đồng thuận với HOTA: YOLO11m + BoT-SORT đạt 64,90 và giảm IDSW từ 1.521 của ByteTrack xuống 498. Tuy nhiên, MOTA không luôn xếp hạng giống HOTA: với RF-DETR-M, ByteTrack đạt MOTA 45,21, cao hơn BoT-SORT 40,45. Sự khác biệt này cho thấy cần xem đồng thời chất lượng phát hiện và định danh. Các so sánh là mô tả kết quả tổng hợp; chưa có khoảng tin cậy theo chuỗi để suy ra ý nghĩa thống kê.
 
@@ -670,7 +670,7 @@ Quan sát định tính cần kiểm tra đồng thời hộp bao và sự liên
 
 Bảng~\ref{tab:oracle} cho thấy HOTA oracle từ 84,30 đến 94,93, cao hơn kết quả tốt nhất dùng detector thật từ 37,92 đến 43,48 điểm. Trong khi đó, đổi tracker trong cùng detector ở ma trận chính chỉ tạo khoảng chênh 6,17--6,98 điểm. Mức cách biệt này gợi ý cải thiện phát hiện là hướng có tiềm năng lớn. Khi hộp bị bỏ sót, tracker không có quan sát để cập nhật, khiến quỹ đạo đứt đoạn và AssA cũng suy giảm; do đó lỗi detector và lỗi liên kết không độc lập.
 
-Oracle là một mốc tham chiếu với đầu vào lý tưởng, không phải phép phân rã nhân quả cho phép quy toàn bộ phần chênh thành lỗi detector. Điểm vẫn dưới 100 vì tracker còn phải khởi tạo, xác nhận và nối quỹ đạo; việc thay đầu vào cũng thay đổi các điều kiện ghép cặp. Ví dụ, BoT-SORT đạt DetA 97,52 và AssA 92,47 ngay cả khi hộp đầu vào là nhãn chuẩn.
+Oracle là một mốc tham chiếu với đầu vào lý tưởng (Bảng~\ref{tab:oracle} và Hình~\ref{fig:oracle}), không phải phép phân rã nhân quả cho phép quy toàn bộ phần chênh thành lỗi detector. Điểm vẫn dưới 100 vì tracker còn phải khởi tạo, xác nhận và nối quỹ đạo; việc thay đầu vào cũng thay đổi các điều kiện ghép cặp. Ví dụ, BoT-SORT đạt DetA 97,52 và AssA 92,47 ngay cả khi hộp đầu vào là nhãn chuẩn.
 
 OC-SORT đạt HOTA oracle 89,99, cao hơn ByteTrack 86,48, nhưng lại thấp hơn ByteTrack với cả ba detector thật. Đây là sự đảo thứ hạng đáng chú ý: hiệu quả của cơ chế dựa trên quan sát phụ thuộc chất lượng quan sát đầu vào. Kết quả phù hợp với giả thuyết ByteTrack có lợi thế khi tận dụng hộp score thấp trong các đoạn quan sát thiếu; cần thí nghiệm kiểm soát mức bỏ sót và nhiễu để xác nhận nguyên nhân này.
 
@@ -710,7 +710,7 @@ OC-SORT đạt HOTA oracle 89,99, cao hơn ByteTrack 86,48, nhưng lại thấp 
 
 Đối tượng nhỏ là nhóm khó nhất: AR nhỏ trên MOT test-dev của YOLO11m, Faster R-CNN và RF-DETR-M lần lượt là 19,83; 22,75 và 23,00, trong khi AR lớn đạt 56,90; 57,84 và 65,55. Kết hợp với AP nhỏ khoảng 8 điểm, số liệu cho thấy vừa bỏ sót nhiều vừa khó định vị chính xác. Với BoT-SORT, lớp pedestrian đạt HOTA 36,74--42,17, thấp hơn car 59,72--61,56 (Hình~\ref{fig:hota-lop}). Faster R-CNN có HOTA pedestrian cao nhất, nhưng ảnh vào, kiến trúc và quy trình học đều khác, nên chưa thể quy kết lợi thế chỉ cho độ phân giải.
 
-Sau lọc ignored, cache RF-DETR-M chứa 1.383.694 hộp, YOLO11m chứa 710.254 hộp trên cùng 6.635 frame ở ngưỡng 0,05. Nhiều hộp hơn không đồng nghĩa nhiều dương tính giả hơn nếu chưa ghép với nhãn chuẩn. Ở điểm làm việc score 0,5, YOLO11m có precision 73,83 và recall 54,19; RF-DETR-M có precision 64,98 và recall 52,69. Các số này cho thấy cần chọn ngưỡng theo từng detector và phân tích FP/FN bằng giao thức thống nhất. Hình~\ref{fig:recall-size} chừa vị trí tổng hợp AR theo ba nhóm kích thước COCO, không dùng các bin kích thước chưa có kết quả đo.
+Sau lọc ignored, cache RF-DETR-M chứa 1.383.694 hộp, YOLO11m chứa 710.254 hộp trên cùng 6.635 frame ở ngưỡng 0,05. Nhiều hộp hơn không đồng nghĩa nhiều dương tính giả hơn nếu chưa ghép với nhãn chuẩn. Ở điểm làm việc score 0,5, YOLO11m có precision 73,83 và recall 54,19; RF-DETR-M có precision 64,98 và recall 52,69. Các số này cho thấy cần chọn ngưỡng theo từng detector và phân tích FP/FN bằng giao thức thống nhất. Hình~\ref{fig:loi-det} tổng hợp kết quả phân tích định lượng chất lượng phát hiện theo ba nhóm kích thước COCO (Hình~\ref{fig:recall-size}) và theo năm lớp đối tượng đánh giá (Hình~\ref{fig:hota-lop}).
 
 \begin{figure}[!htbp]
   \centering
@@ -727,7 +727,7 @@ Sau lọc ignored, cache RF-DETR-M chứa 1.383.694 hộp, YOLO11m chứa 710.25
 
 DeepSORT hơn SORT 1,06 điểm HOTA với YOLO11m, hơn 0,41 điểm với Faster R-CNN nhưng kém 0,24 điểm với RF-DETR-M. Lợi ích của ReID tiền huấn luyện trên MSMT17 vì vậy chưa nhất quán trong các cấu hình khảo sát. Miền huấn luyện ReID là người đi bộ từ camera mặt đất, còn ở đây có cả phương tiện và crop nhỏ từ trên cao; sự lệch miền có thể làm đặc trưng ngoại hình kém phân biệt.
 
-BoT-SORT hơn ByteTrack trên cả ba detector, phù hợp với vai trò của bù chuyển động camera và bổ sung ngoại hình. Tuy nhiên, hai thuật toán còn khác cách biểu diễn trạng thái và chi phí ghép, nên so sánh này không chứng minh riêng GMC hay ReID gây ra mức tăng. Bảng~\ref{tab:ablation} ghi rõ các thí nghiệm tách thành phần còn thiếu. Khi thực hiện, cần giữ nguyên detector, ngưỡng, dữ liệu và quy trình đo, lần lượt tắt ReID hoặc GMC trên val trước khi khóa cấu hình cuối.
+BoT-SORT hơn ByteTrack trên cả ba detector, phù hợp với vai trò của bù chuyển động camera và bổ sung ngoại hình. Tuy nhiên, hai thuật toán còn khác cách biểu diễn trạng thái và chi phí ghép, nên so sánh này không chứng minh riêng GMC hay ReID gây ra mức tăng. Bảng~\ref{tab:ablation} ghi rõ các thí nghiệm tách thành phần còn thiếu. Khi thực hiện, cần giữ nguyên detector, ngưỡng, dữ liệu và quy trình đo, lần lượt tắt ReID hoặc GMC trên val trước khi khóa cấu hình cuối. Các dạng lỗi điển hình gồm đổi định danh khi giao cắt, bỏ sót đối tượng nhỏ và dương tính giả được minh họa trực quan trong Hình~\ref{fig:loi-vd}.
 
 \begin{table}[!htbp]
   \centering
@@ -875,7 +875,7 @@ Phát hiện biển số và nhận dạng ký tự quang học (\textit{optical
 VisDrone hiện không cung cấp nhãn biển số, ký tự hoặc trạng thái đèn phục vụ các chức năng này. Nhóm cần bổ sung dữ liệu giao thông có nhãn phương tiện, vùng biển số, chuỗi ký tự, pha đèn và thời điểm sự kiện. Cần giữ các video cùng camera hoặc cùng bối cảnh thu gần nhau trong một split để hạn chế rò rỉ. Video nhìn từ độ cao lớn có thể không đủ độ phân giải để đọc biển số; khi đó cần nguồn camera có góc nhìn và cự ly phù hợp, thay vì kỳ vọng tracker khôi phục thông tin không có trong ảnh.
 
 \subsection*{Lộ trình tích hợp và kiểm thử}
-Giai đoạn đầu xây dựng luồng video trực tiếp và giao diện với cấu hình YOLO11m + ByteTrack làm mốc tốc độ, đồng thời giữ BoT-SORT để so sánh định danh. Giai đoạn tiếp theo bổ sung trạng thái đèn, vạch dừng và phát hiện sự kiện có minh chứng. Sau đó tích hợp detector biển số và OCR, đánh giá riêng từng mô-đun trước khi đánh giá toàn hệ thống. Cuối cùng, nhóm kiểm thử video độc lập, đo tốc độ có cả giải mã, hiển thị và lưu kết quả, đồng thời đóng gói hướng dẫn chạy và video trình diễn. Các thành viên tiếp tục phụ trách mô hình tương ứng; công việc tích hợp sản phẩm là nhiệm vụ phối hợp của cả nhóm và cần được cập nhật trong kế hoạch cuối kỳ.
+Giai đoạn đầu xây dựng luồng video trực tiếp và giao diện với cấu hình YOLO11m + ByteTrack làm mốc tốc độ, đồng thời giữ BoT-SORT để so sánh định danh. Giai đoạn tiếp theo bổ sung trạng thái đèn, vạch dừng và phát hiện sự kiện có minh chứng. Sau đó tích hợp detector biển số và OCR, đánh giá riêng từng mô-đun trước khi đánh giá toàn hệ thống. Cuối cùng, nhóm kiểm thử video độc lập, đo tốc độ có cả giải mã, hiển thị và lưu kết quả, đồng thời đóng gói hướng dẫn chạy và video trình diễn. Các thành viên tiếp tục phụ trách mô hình tương ứng; công việc tích hợp sản phẩm là nhiệm vụ phối hợp của cả nhóm và cần được cập nhật trong kế hoạch cuối kỳ. Kiến trúc tổng thể của hệ thống định hướng cuối kỳ được trình bày trong Hình~\ref{fig:cuoi-ky}.
 
 \begin{figure}[!htbp]
   \centering
@@ -1055,7 +1055,7 @@ Hình~\ref{fig:det-cung-frame} so sánh nhãn chuẩn (GT) với kết quả ph�
   \label{fig:det-cung-frame}
 \end{figure}
 
-\section{Trực quan hóa suy luận của 15 tổ hợp Detector $\times$ Tracker trên cùng khung hình}
+\section{Trực quan hóa suy luận của 15 tổ hợp Detector \texorpdfstring{$\times$}{x} Tracker trên cùng khung hình}
 \label{sec:app-15-combos}
 
 Để đánh giá toàn diện tác động của từng mô hình phát hiện (YOLO11m, Faster R-CNN, RF-DETR-M) khi phối hợp cùng năm thuật toán theo vết (SORT, DeepSORT, ByteTrack, OC-SORT, BoT-SORT), toàn bộ 15 tổ hợp được triển khai suy luận trên cùng một khung hình thực nghiệm tiêu biểu: \textbf{khung hình số 150 thuộc chuỗi \texttt{uav0000297\_02761\_v}} của tập kiểm thử VisDrone2019-MOT test-dev.
@@ -1183,7 +1183,7 @@ Mã nguồn và hướng dẫn chạy đầy đủ nằm tại \url{https://gith
 
 
 \section{Cấu trúc cây thư mục}
-Cây thư mục dưới đây trình bày các thành phần chính của hệ thống. Các nhánh được nhóm theo dữ liệu, xử lý mô hình và kết quả thực nghiệm; các thư mục con phục vụ từng lần chạy được lược bớt để dễ theo dõi.
+Cây thư mục trong Bảng~\ref{tab:cay-thu-muc} trình bày các thành phần chính của hệ thống. Các nhánh được nhóm theo dữ liệu, xử lý mô hình và kết quả thực nghiệm; các thư mục con phục vụ từng lần chạy được lược bớt để dễ theo dõi.
 
 \begin{table}[H]
   \centering\small
