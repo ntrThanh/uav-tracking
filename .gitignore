@@ -61,6 +61,7 @@ nohup.out
 
 # Office lock files
 ~$*
+.~lock.*#
 
 # Local tracking results and model artifacts
 outputs/tracking_app/
